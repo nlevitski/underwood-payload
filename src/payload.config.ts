@@ -14,7 +14,7 @@ import { ProductItems } from './collections/ProductItems'
 import { ProductItemAttributes } from './collections/ProductItemAttributes'
 import { Articles } from './collections/Articles/config'
 import { env } from './lib/env'
-import { ArticleAuthors } from './collections/ArticleAuthors'
+import { ArticleAuthors } from './collections/ArticleAuthors/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
