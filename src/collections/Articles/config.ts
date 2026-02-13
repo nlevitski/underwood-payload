@@ -2,11 +2,10 @@ import type { CollectionConfig } from 'payload'
 import { generateSlugHook } from './hooks/generate-slug.hook'
 import { generateContentSummaryHook } from './hooks/generate-content-summary.hook'
 import { convertLexicalToPlaintext } from '@payloadcms/richtext-lexical/plaintext'
+import { statusOptions } from './constants'
 
 // fields
 // - tags (optional, relationship to tags)
-// - status (draft, published)
-// - published_at (only visible when status is published)
 
 // - created_at (auto-generated)
 // - updated_at (auto-generated)
@@ -78,16 +77,16 @@ export const Articles: CollectionConfig = {
     {
       name: 'status',
       type: 'select',
-      options: ['Draft', 'Published'],
+      options: Object.values(statusOptions),
       required: true,
-      defaultValue: 'Draft',
+      defaultValue: statusOptions.draft,
     },
     {
       name: 'publishedAt',
       type: 'date',
       required: true,
       admin: {
-        condition: (data) => data?.status === 'Published',
+        condition: (data) => data?.status === statusOptions.published,
         date: { pickerAppearance: 'dayAndTime' },
       },
     },

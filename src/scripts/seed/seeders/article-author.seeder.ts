@@ -10,6 +10,7 @@ export async function seedArticleAuthor(payload: Payload) {
       console.warn(`Stopped seeding article author because no image was created`)
       return
     }
+    
     await payload.create({
       collection: 'article-authors',
       data: {
