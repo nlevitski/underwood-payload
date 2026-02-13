@@ -50,4 +50,5 @@ node_modules/
 /playwright/.cache/
 
 # data
-/data
+data/
+data/*
