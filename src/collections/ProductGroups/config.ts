@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { generateSlugHook } from './hooks/generate-slug.hook'
 
 export const ProductGroups: CollectionConfig = {
   slug: 'product-groups',
@@ -18,6 +19,9 @@ export const ProductGroups: CollectionConfig = {
       required: true,
       unique: true,
       index: true,
+      hooks: {
+        beforeValidate: [generateSlugHook],
+      },
     },
   ],
 }

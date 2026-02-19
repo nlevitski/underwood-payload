@@ -2,6 +2,7 @@ import { Payload } from 'payload'
 import { faker } from '@faker-js/faker'
 import { ArticleAuthorRoleOptions } from '@/collections/ArticleAuthors/constants'
 import { createMediaFromImageUrl } from '../lib/create-media-from-image-url'
+
 export async function seedArticleAuthor(payload: Payload) {
   try {
     const imageURL = faker.image.personPortrait({ size: 256 })
@@ -10,8 +11,8 @@ export async function seedArticleAuthor(payload: Payload) {
       console.warn(`Stopped seeding article author because no image was created`)
       return
     }
-    
-    await payload.create({
+
+    return await payload.create({
       collection: 'article-authors',
       data: {
         name: faker.person.fullName(),

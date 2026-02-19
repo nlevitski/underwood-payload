@@ -72,8 +72,11 @@ export interface Config {
     'product-groups': ProductGroup;
     'product-categories': ProductCategory;
     'product-attributes': ProductAttribute;
+    'product-ages': ProductAge;
     'product-items': ProductItem;
+    'product-variants': ProductVariant;
     'product-item-attributes': ProductItemAttribute;
+    pots: Pot;
     articles: Article;
     'article-authors': ArticleAuthor;
     'payload-kv': PayloadKv;
@@ -88,8 +91,11 @@ export interface Config {
     'product-groups': ProductGroupsSelect<false> | ProductGroupsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
+    'product-ages': ProductAgesSelect<false> | ProductAgesSelect<true>;
     'product-items': ProductItemsSelect<false> | ProductItemsSelect<true>;
+    'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     'product-item-attributes': ProductItemAttributesSelect<false> | ProductItemAttributesSelect<true>;
+    pots: PotsSelect<false> | PotsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-authors': ArticleAuthorsSelect<false> | ArticleAuthorsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -211,6 +217,17 @@ export interface ProductAttribute {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-ages".
+ */
+export interface ProductAge {
+  id: number;
+  label: string;
+  months: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-items".
  */
 export interface ProductItem {
@@ -218,6 +235,55 @@ export interface ProductItem {
   category: number | ProductCategory;
   name: string;
   slug: string;
+  /**
+   * Edit item attributes inline. Values are stored in Product Item Attributes collection.
+   */
+  itemAttributes?:
+    | {
+        attribute: number | ProductAttribute;
+        value: string;
+        /**
+         * Optional. If empty, it will be set to Value on save.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-variants".
+ */
+export interface ProductVariant {
+  id: number;
+  item: number | ProductItem;
+  age: number | ProductAge;
+  pot: number | Pot;
+  /**
+   * Generated automatically from item, age, and pot.
+   */
+  sku?: string | null;
+  price: number;
+  stockQty: number;
+  isAvailable: boolean;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pots".
+ */
+export interface Pot {
+  id: number;
+  displayName?: string | null;
+  code: string;
+  volumeLiters: number;
+  diameterMinCm: number;
+  diameterMaxCm: number;
+  heightMinCm: number;
+  heightMaxCm: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -229,9 +295,8 @@ export interface ProductItemAttribute {
   id: number;
   item: number | ProductItem;
   attribute: number | ProductAttribute;
-  valueText?: string | null;
-  valueNumber?: number | null;
-  valueBoolean?: boolean | null;
+  label: string;
+  value: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -324,12 +389,24 @@ export interface PayloadLockedDocument {
         value: number | ProductAttribute;
       } | null)
     | ({
+        relationTo: 'product-ages';
+        value: number | ProductAge;
+      } | null)
+    | ({
         relationTo: 'product-items';
         value: number | ProductItem;
       } | null)
     | ({
+        relationTo: 'product-variants';
+        value: number | ProductVariant;
+      } | null)
+    | ({
         relationTo: 'product-item-attributes';
         value: number | ProductItemAttribute;
+      } | null)
+    | ({
+        relationTo: 'pots';
+        value: number | Pot;
       } | null)
     | ({
         relationTo: 'articles';
@@ -457,12 +534,45 @@ export interface ProductAttributesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-ages_select".
+ */
+export interface ProductAgesSelect<T extends boolean = true> {
+  label?: T;
+  months?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-items_select".
  */
 export interface ProductItemsSelect<T extends boolean = true> {
   category?: T;
   name?: T;
   slug?: T;
+  itemAttributes?:
+    | T
+    | {
+        attribute?: T;
+        value?: T;
+        label?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-variants_select".
+ */
+export interface ProductVariantsSelect<T extends boolean = true> {
+  item?: T;
+  age?: T;
+  pot?: T;
+  sku?: T;
+  price?: T;
+  stockQty?: T;
+  isAvailable?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -473,9 +583,23 @@ export interface ProductItemsSelect<T extends boolean = true> {
 export interface ProductItemAttributesSelect<T extends boolean = true> {
   item?: T;
   attribute?: T;
-  valueText?: T;
-  valueNumber?: T;
-  valueBoolean?: T;
+  label?: T;
+  value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pots_select".
+ */
+export interface PotsSelect<T extends boolean = true> {
+  displayName?: T;
+  code?: T;
+  volumeLiters?: T;
+  diameterMinCm?: T;
+  diameterMaxCm?: T;
+  heightMinCm?: T;
+  heightMaxCm?: T;
   updatedAt?: T;
   createdAt?: T;
 }

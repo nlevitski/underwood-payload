@@ -7,14 +7,17 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media/config'
-import { ProductGroups } from './collections/ProductGroups'
-import { ProductCategories } from './collections/ProductCategories'
-import { ProductAttributes } from './collections/ProductAttributes'
-import { ProductItems } from './collections/ProductItems'
-import { ProductItemAttributes } from './collections/ProductItemAttributes'
+import { ProductGroups } from './collections/ProductGroups/config'
+import { ProductCategories } from './collections/ProductCategories/config'
+import { ProductAttributes } from './collections/ProductAttributes/config'
+import { ProductItems } from './collections/ProductItems/config'
+import { ProductVariants } from './collections/ProductVariants/config'
+import { ProductItemAttributes } from './collections/ProductItemAttributes/config'
+import { ProductAges } from './collections/ProductAges/config'
 import { Articles } from './collections/Articles/config'
 import { env } from './lib/env'
 import { ArticleAuthors } from './collections/ArticleAuthors/config'
+import { Pots } from './collections/Pots/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -36,8 +39,11 @@ export default buildConfig({
     ProductGroups,
     ProductCategories,
     ProductAttributes,
+    ProductAges,
     ProductItems,
+    ProductVariants,
     ProductItemAttributes,
+    Pots,
     Articles,
     ArticleAuthors,
   ],

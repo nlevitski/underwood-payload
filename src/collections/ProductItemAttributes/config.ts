@@ -3,8 +3,8 @@ import type { CollectionConfig } from 'payload'
 export const ProductItemAttributes: CollectionConfig = {
   slug: 'product-item-attributes',
   admin: {
-    useAsTitle: 'id',
-    defaultColumns: ['item', 'attribute', 'valueText', 'valueNumber', 'valueBoolean'],
+    useAsTitle: 'label',
+    defaultColumns: ['item', 'label', 'value'],
   },
   fields: [
     {
@@ -22,16 +22,15 @@ export const ProductItemAttributes: CollectionConfig = {
       index: true,
     },
     {
-      name: 'valueText',
+      name: 'label',
       type: 'text',
+      required: true,
+      index: true,
     },
     {
-      name: 'valueNumber',
-      type: 'number',
-    },
-    {
-      name: 'valueBoolean',
-      type: 'checkbox',
+      name: 'value',
+      type: 'text',
+      required: true,
     },
   ],
 }

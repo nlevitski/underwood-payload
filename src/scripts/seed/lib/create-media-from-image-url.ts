@@ -3,8 +3,10 @@ import { Payload } from 'payload'
 
 export async function createMediaFromImageUrl(payload: Payload, imageURL: string) {
   try {
-    const imageURL = faker.image.personPortrait({ size: 256 })
     const res = await fetch(imageURL)
+    if (!res.ok) {
+      throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`)
+    }
     const arrBuffer = await res.arrayBuffer()
     const buffer = Buffer.from(arrBuffer)
 
