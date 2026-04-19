@@ -1,11 +1,23 @@
-import Link from 'next/link'
+import { About } from './_components/about/About'
+import { BlogPreview } from './_components/blogPreview/BlogPreview'
+import { Categories } from './_components/categories/Categories'
+import { CTA } from './_components/cTA/CTA'
+import { Features } from './_components/features/Features'
+import { Hero } from './_components/hero/Hero'
+import { NurseryPhotos } from './_components/nurseryPhotos/NurseryPhotos'
+import { PopularPlants } from './_components/popularPlants/PopularPlants'
 
 export default async function HomePage() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Hello world!</h1>
-      <Link href="/articles">Articles</Link>
-      <Link href="/catalog">Catalog</Link>
+      <Hero />
+      <Features />
+      <About />
+      <Categories />
+      <PopularPlants />
+      <NurseryPhotos />
+      <BlogPreview />
+      <CTA />
     </>
   )
 }

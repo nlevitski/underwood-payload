@@ -2,6 +2,8 @@ import React from 'react'
 import type { Metadata } from 'next'
 import { ThemeProvider } from '@/components/theme-provider'
 import './global.css'
+import { Footer } from './Footer'
+import { Header } from './Header'
 
 export const metadata: Metadata = {
   description: 'A blank template using Payload in a Next.js app.',
@@ -26,14 +28,17 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          forcedTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
-          <main>{children}</main>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

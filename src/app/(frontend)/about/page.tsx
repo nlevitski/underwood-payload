@@ -1,10 +1,17 @@
-import Link from 'next/link'
+import { AboutCTA } from '../_components/aboutPage/AboutCTA'
+import { AboutHero } from '../_components/aboutPage/AboutHero'
+import { AboutStats } from '../_components/aboutPage/AboutStats'
+import { AboutStory } from '../_components/aboutPage/AboutStory'
+import { AboutValues } from '../_components/aboutPage/AboutValues'
 
-export default async function AboutPage() {
+export default function AboutPage() {
   return (
     <>
-      <h1 className="text-3xl font-bold underline">About Page</h1>
-      <Link href="/">Главная</Link>
+      <AboutHero />
+      <AboutStats />
+      <AboutStory />
+      <AboutValues />
+      <AboutCTA />
     </>
   )
 }

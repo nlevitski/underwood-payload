@@ -22,7 +22,7 @@ export default async function ArticlesPage() {
   console.log('articles', articles)
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Articles Page</h1>
+      {/* <h1 className="text-3xl font-bold underline">Articles Page</h1>
       <h2>
         <Link href="/">Главная</Link>
       </h2>
@@ -86,7 +86,7 @@ export default async function ArticlesPage() {
             )
           },
         )}
-      </div>
+      </div> */}
     </>
   )
 }
