@@ -4,7 +4,7 @@ type CatalogItem = {
 }
 
 type CatalogCategory = {
-  group: 'conifers' | 'berries' | 'shrubs'
+  group: 'conifers' | 'berries' | 'foliage' | 'perennials'
   category: string
   categorySlug: string
   items: CatalogItem[]
@@ -183,13 +183,13 @@ export const productCatalog: CatalogCategory[] = [
     items: [{ name: 'Стивенс', attributes: { ripening_time: 'Поздний', growth_form: 'Низкорослая', features: 'Промышленный сорт, плоды крупные, кисло-сладкие', color: '' } }],
   },
   {
-    group: 'shrubs',
+    group: 'foliage',
     category: 'Дёрен',
     categorySlug: 'dogwood',
     items: [{ name: 'Белый Элегантиссимо', attributes: { growth_form: 'Кустовидная, компактная', features: 'Белые цветки, декоративная кора, средний рост', color: 'Белая кора / зелёная листва' } }],
   },
   {
-    group: 'shrubs',
+    group: 'foliage',
     category: 'Пузыреплодник',
     categorySlug: 'ninebark',
     items: [{ name: 'Дьябло', attributes: { growth_form: 'Кустовидная, компактная', features: 'Тёмно-бордовая листва, декоративные плоды', color: 'Тёмно-бордовая' } }],

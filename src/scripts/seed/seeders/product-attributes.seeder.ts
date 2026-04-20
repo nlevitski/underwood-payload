@@ -9,7 +9,7 @@ type ProductAttribute = {
 }
 
 type ProductAttributeCollection = {
-  category: 'conifers' | 'berries' | 'shrubs'
+  category: 'conifers' | 'berries' | 'foliage'
   name: string
   attributes: ProductAttribute[]
 }
@@ -26,7 +26,7 @@ const berryAttributes: ProductAttribute[] = [
   { label: 'Цвет', key: 'color', dataType: 'text' },
 ]
 
-const shrubAttributes: ProductAttribute[] = [
+const foliageAttributes: ProductAttribute[] = [
   { label: 'Рост и форма', key: 'growth_form', dataType: 'text' },
   { label: 'Особенности', key: 'features', dataType: 'text' },
   { label: 'Цвет', key: 'color', dataType: 'text' },
@@ -46,8 +46,8 @@ const collections: ProductAttributeCollection[] = [
   { category: 'berries', name: 'Крыжовник', attributes: berryAttributes },
   { category: 'berries', name: 'Брусника', attributes: berryAttributes },
   { category: 'berries', name: 'Клюква', attributes: berryAttributes },
-  { category: 'shrubs', name: 'Дёрен', attributes: shrubAttributes },
-  { category: 'shrubs', name: 'Пузыреплодник', attributes: shrubAttributes },
+  { category: 'foliage', name: 'Дёрен', attributes: foliageAttributes },
+  { category: 'foliage', name: 'Пузыреплодник', attributes: foliageAttributes },
 ]
 
 export async function seedProductAttributes(payload: Payload) {

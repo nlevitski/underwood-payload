@@ -47,9 +47,10 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">Категории</h4>
             <nav className="flex flex-col gap-2">
               {[
-                { href: '/catalog?category=coniferous', label: 'Хвойные' },
-                { href: '/catalog?category=berry', label: 'Ягодные' },
-                { href: '/catalog?category=deciduous', label: 'Лиственные' },
+                { href: '/catalog?category=conifers', label: 'Хвойные' },
+                { href: '/catalog?category=berries', label: 'Ягодные' },
+                { href: '/catalog?category=foliage', label: 'Лиственные' },
+                { href: '/catalog?category=perennials', label: 'Многолетние' },
               ].map((link) => (
                 <Link
                   key={link.href}
