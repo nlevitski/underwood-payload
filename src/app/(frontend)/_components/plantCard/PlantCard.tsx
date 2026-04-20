@@ -2,7 +2,6 @@
 
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import { Toggle } from '@/components/ui/toggle'
 import { Product, AgeType, SizeType, AgePostfix, SizePostfix } from '../../catalog/products'
 import { StaticImageData } from 'next/image'
 import { useState } from 'react'
@@ -78,35 +77,36 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
-      <div className="flex flex-1 flex-col p-4 space-y-2">
+      <div className="flex flex-1 flex-col p-3 space-y-2.5">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {props.category}
         </span>
-        <h3 className="font-semibold text-foreground group-hover:text-forest transition-colors">
+        <h3 className="text-base font-semibold text-foreground group-hover:text-forest transition-colors">
           {props.name}
         </h3>
 
         {/* Pot selection */}
         <div>
-          <p className="text-muted-foreground text-sm mb-1">Горшок:</p>
-          <div className="flex flex-wrap gap-1">
+          <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
+          <div className="flex flex-wrap gap-1.5">
             {props.pots.map((pot) => (
-              <Toggle
+              <button
                 key={pot.name}
-                variant="outline"
-                size="sm"
-                pressed={pot.id === potId}
-                onPressedChange={(pressed) => {
-                  if (!pressed) return
+                type="button"
+                onClick={() => {
                   togglePot(pot.id)
                 }}
                 onMouseEnter={() => handlePotHover(pot.id)}
                 onMouseLeave={handlePotLeave}
                 aria-label={pot.name}
-                className="min-w-[3rem]"
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                  pot.id === potId
+                    ? 'bg-forest text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'
+                }`}
               >
                 {pot.name}
-              </Toggle>
+              </button>
             ))}
           </div>
         </div>
@@ -114,34 +114,36 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
         {/* Value selection (age/size) - only if not 'none' */}
         {props.valueType !== 'none' && (
           <div>
-            <p className="text-muted-foreground text-sm mb-1">{`${valueMap[props.valueType]}:`}</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="text-xs text-muted-foreground mb-1.5 block">{`${valueMap[props.valueType]}`}</p>
+            <div className="flex flex-wrap gap-1.5">
               {(currentPot.variants as VariantWithValue[]).map((v) => (
-                <Toggle
+                <button
                   key={v.id}
-                  variant="outline"
-                  size="sm"
-                  pressed={v.id === variantId}
-                  onPressedChange={(pressed) => {
-                    if (!pressed) return
+                  type="button"
+                  onClick={() => {
                     setVariantId(v.id)
                     setHoveredVariantId(null)
                   }}
                   onMouseEnter={() => handleVariantHover(v.id)}
                   onMouseLeave={handleVariantLeave}
                   aria-label={`${v.value} ${v.postfix}`}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    v.id === variantId
+                      ? 'bg-forest text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-accent'
+                  }`}
                 >
                   {`${v.value} ${v.postfix}`}
-                </Toggle>
+                </button>
               ))}
             </div>
           </div>
         )}
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-lg font-bold text-foreground">{curVariant.price} BYN</span>
+          <span className="text-base font-bold text-foreground">{curVariant.price} BYN</span>
           <span
-            className={`text-xs font-medium px-2 py-1 rounded-full ${
+            className={`text-xs font-medium px-2 py-0.5 rounded-full ${
               curVariant.inStock
                 ? 'bg-accent text-accent-foreground'
                 : 'bg-muted text-muted-foreground'

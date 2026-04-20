@@ -26,7 +26,7 @@ export function CTA() {
               asChild
               variant="outline"
               size="lg"
-              className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              className="border-primary-foreground bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground hover:text-primary"
             >
               <Link href="/contacts">Контакты</Link>
             </Button>

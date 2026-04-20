@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import * as motion from 'motion/react-client'
 import { Filter, X } from 'lucide-react'
@@ -26,17 +25,9 @@ import {
 import { PlantCard } from '../_components/plantCard/PlantCard'
 import { products, categories as categoriesMap } from './products'
 
-const categoryQueryMap = {
-  berry: 'berries',
-  coniferous: 'conifers',
-  deciduous: 'foliage',
-} as const
-
 const perPageOptions = [12, 24, 48] as const
 
 export default function CatalogPage() {
-  const searchParams = useSearchParams()
-
   // Calculate dynamic filter values from products
   const { categories, potVolumes, minPrice, maxPrice } = useMemo(() => {
     const categoryKeys = new Set<string>()
@@ -75,16 +66,8 @@ export default function CatalogPage() {
     }
   }, [])
 
-  const initialCategories = useMemo(() => {
-    const categoryParam = searchParams.get('category')
-    if (!categoryParam) return []
-
-    const mappedCategory = categoryQueryMap[categoryParam as keyof typeof categoryQueryMap]
-    return mappedCategory ? [mappedCategory] : [categoryParam]
-  }, [searchParams])
-
   const [showFilters, setShowFilters] = useState(false)
-  const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategories)
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedPots, setSelectedPots] = useState<string[]>([])
   const [priceRange, setPriceRange] = useState<[number, number]>([minPrice, maxPrice])
   const [inStockOnly, setInStockOnly] = useState(false)

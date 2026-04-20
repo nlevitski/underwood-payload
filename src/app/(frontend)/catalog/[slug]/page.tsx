@@ -3,6 +3,7 @@ import { products } from '../products'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { ProductClient } from './ProductClient'
+import { CareGuideSection } from './CareGuideSection'
 import { PlantCard } from '../../_components/plantCard/PlantCard'
 
 type ProductPageProps = {
@@ -66,8 +67,10 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </section>
 
+      <CareGuideSection cares={product.cares} />
+
       {similarProducts.length > 0 && (
-        <section className="py-12 bg-cream-dark">
+        <section className="py-12 bg-background">
           <div className="container">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8">
               Похожие растения

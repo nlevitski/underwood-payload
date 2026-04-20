@@ -68,11 +68,13 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <PhoneIcon />
-                <span className="text-sm text-muted-foreground">+375 29 123-45-67</span>
+                <span className="text-sm text-muted-foreground">+375 29 343-00-06</span>
               </div>
               <div className="flex items-start gap-3">
                 <MapPinIcon />
-                <span className="text-sm text-muted-foreground">Минская обл., Минский р-н</span>
+                <span className="text-sm text-muted-foreground">
+                  Минская обл., Минский р-н, д. Обчак, ул. Западная
+                </span>
               </div>
               <div className="flex items-start gap-3">
                 <ClockIcon />
@@ -84,7 +86,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border">
           <p className="text-center text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Underwood. Демо дизайна.
+            © {new Date().getFullYear()} Underwood
           </p>
         </div>
       </div>

@@ -1,0 +1,44 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        DATABASE_URL: ${DATABASE_URL}
+        PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+        CMS_SEED_ADMIN_EMAIL: ${CMS_SEED_ADMIN_EMAIL}
+        CMS_SEED_ADMIN_PASSWORD: ${CMS_SEED_ADMIN_PASSWORD}
+    image: underwood-payload
+    container_name: underwood-payload
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3005}
+      HOSTNAME: 0.0.0.0
+    volumes:
+      - payload-data:/app/data
+      - payload-media:/app/media
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: lignin
+      traefik.http.routers.underwood.rule: Host(`underwood.by`)
+      traefik.http.routers.underwood.entrypoints: websecure
+      traefik.http.routers.underwood.tls: 'true'
+      traefik.http.routers.underwood.service: underwood
+      traefik.http.services.underwood.loadbalancer.server.port: '${PORT:-3005}'
+      traefik.http.routers.underwood-http.rule: Host(`underwood.by`)
+      traefik.http.routers.underwood-http.entrypoints: web
+      traefik.http.routers.underwood-http.middlewares: underwood-https-redirect
+      traefik.http.middlewares.underwood-https-redirect.redirectscheme.scheme: https
+    networks:
+      - lignin
+
+volumes:
+  payload-data:
+  payload-media:
+
+networks:
+  lignin:
+    external: true

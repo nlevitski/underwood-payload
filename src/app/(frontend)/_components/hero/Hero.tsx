@@ -52,7 +52,7 @@ export function Hero({
       <Button
         variant="outline"
         asChild
-        className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
+        className="border-primary-foreground bg-primary-foreground/10 text-primary-foreground hover:bg-primary-foreground hover:text-foreground"
       >
         <Link href="/contacts">Связаться с нами</Link>
       </Button>

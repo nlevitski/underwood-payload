@@ -3,30 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { BlogCard } from '../blogCard/BlogCard'
-
-import thujaImage from '@/assets/plant-thuja.jpg'
-import blueberryImage from '@/assets/plant-blueberry.jpg'
-
-const blogPosts = [
-  {
-    id: 'thuja-care',
-    title: 'Как ухаживать за туями: полное руководство',
-    excerpt:
-      'Разбираем основные правила полива, подкормки и обрезки туй в условиях белорусского климата.',
-    image: thujaImage.src,
-    date: '15 января 2026',
-    category: 'Уход',
-  },
-  {
-    id: 'blueberry-planting',
-    title: 'Посадка голубики: пошаговая инструкция',
-    excerpt:
-      'Выбор места, подготовка почвы и правильная посадка саженцев голубики для богатого урожая.',
-    image: blueberryImage.src,
-    date: '10 января 2026',
-    category: 'Посадка',
-  },
-]
+import { blogPosts } from '../../blog/data'
 
 export function BlogPreview() {
   return (
@@ -50,8 +27,16 @@ export function BlogPreview() {
           </Button>
         </motion.div>
         <div className="grid md:grid-cols-2 gap-6">
-          {blogPosts.map((post) => (
-            <BlogCard key={post.id} {...post} />
+          {blogPosts.slice(0, 2).map((post) => (
+            <BlogCard
+              key={post.id}
+              id={post.id}
+              title={post.title}
+              excerpt={post.excerpt}
+              image={post.image}
+              date={post.date}
+              category={post.category}
+            />
           ))}
         </div>
       </div>

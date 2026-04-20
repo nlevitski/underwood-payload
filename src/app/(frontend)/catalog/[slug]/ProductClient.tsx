@@ -4,9 +4,8 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import * as motion from 'motion/react-client'
-import { Phone, Droplets, Sun, Thermometer, Ruler } from 'lucide-react'
+import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Toggle } from '@/components/ui/toggle'
 import type { Product, AgeType, SizeType, AgePostfix, SizePostfix } from '../products'
 
 type VariantWithValue = {
@@ -20,13 +19,6 @@ type VariantWithValue = {
 const valueMap = {
   size: 'Размер',
   age: 'Возраст',
-}
-
-const careIcons = {
-  watering: Droplets,
-  light: Sun,
-  temperature: Thermometer,
-  size: Ruler,
 }
 
 export function ProductClient({ product }: { product: Product }) {
@@ -104,23 +96,23 @@ export function ProductClient({ product }: { product: Product }) {
         {/* Pot selector */}
         <div>
           <span className="text-sm font-medium text-foreground mb-2 block">Объём горшка</span>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {product.pots.map((pot) => (
-              <Toggle
+              <button
                 key={pot.id}
-                variant="outline"
-                pressed={pot.id === potId}
-                onPressedChange={(pressed) => {
-                  if (!pressed) return
-                  togglePot(pot.id)
-                }}
+                type="button"
+                onClick={() => togglePot(pot.id)}
                 onMouseEnter={() => handlePotHover(pot.id)}
                 onMouseLeave={handlePotLeave}
                 aria-label={pot.name}
-                className="min-w-[3.5rem] data-[state=on]:bg-forest data-[state=on]:text-primary-foreground"
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  pot.id === potId
+                    ? 'bg-forest text-primary-foreground'
+                    : 'bg-muted text-muted-foreground hover:bg-accent'
+                }`}
               >
                 {pot.name}
-              </Toggle>
+              </button>
             ))}
           </div>
         </div>
@@ -131,24 +123,26 @@ export function ProductClient({ product }: { product: Product }) {
             <span className="text-sm font-medium text-foreground mb-2 block">
               {valueMap[product.valueType]}
             </span>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5">
               {(currentPot.variants as VariantWithValue[]).map((v) => (
-                <Toggle
+                <button
                   key={v.id}
-                  variant="outline"
-                  pressed={v.id === variantId}
-                  onPressedChange={(pressed) => {
-                    if (!pressed) return
+                  type="button"
+                  onClick={() => {
                     setVariantId(v.id)
                     setHoveredVariantId(null)
                   }}
                   onMouseEnter={() => handleVariantHover(v.id)}
                   onMouseLeave={handleVariantLeave}
                   aria-label={`${v.value} ${v.postfix}`}
-                  className="data-[state=on]:bg-forest data-[state=on]:text-primary-foreground"
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                    v.id === variantId
+                      ? 'bg-forest text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-accent'
+                  }`}
                 >
                   {`${v.value} ${v.postfix}`}
-                </Toggle>
+                </button>
               ))}
             </div>
           </div>
@@ -177,27 +171,9 @@ export function ProductClient({ product }: { product: Product }) {
             </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
-            <a href="tel:+375291234567">+375 29 123-45-67</a>
+            <a href="tel:+375293430006">+375 29 343-00-06</a>
           </Button>
         </div>
-
-        {/* Care instructions */}
-        {product.cares && product.cares.length > 0 && (
-          <div className="pt-6 border-t border-border">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Уход</h2>
-            <div className="space-y-3">
-              {product.cares.map((care, index) => {
-                const Icon = careIcons[care.type]
-                return (
-                  <div key={index} className="flex gap-3">
-                    <Icon className="h-5 w-5 text-forest flex-shrink-0 mt-0.5" />
-                    <p className="text-sm text-muted-foreground">{care.description}</p>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
       </motion.div>
     </div>
   )
