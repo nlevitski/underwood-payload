@@ -1,4 +1,8 @@
-export const ClockIcon = () => (
+type IconProps = {
+  className?: string
+}
+
+export const ClockIcon = ({ className }: IconProps) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"
@@ -9,6 +13,7 @@ export const ClockIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
+    className={className}
   >
     <circle cx="12" cy="12" r="10"></circle>
     <polyline points="12 6 12 12 16 14"></polyline>

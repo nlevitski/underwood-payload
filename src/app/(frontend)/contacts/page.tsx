@@ -58,7 +58,7 @@ export default function ContactsPage() {
                     icon={MapPin}
                     label="Адрес"
                     value="Минская область, Минский район"
-                    description="д. Лесная, ул. Садовая, 1"
+                    description="д. Обчак, ул. Западная"
                   />
                   <ContactDetail
                     icon={Clock}

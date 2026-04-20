@@ -67,18 +67,18 @@ export function Footer() {
             <h4 className="font-semibold text-foreground">Контакты</h4>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
-                <PhoneIcon />
+                <PhoneIcon className="h-5 w-5 shrink-0" />
                 <span className="text-sm text-muted-foreground">+375 29 343-00-06</span>
               </div>
               <div className="flex items-start gap-3">
-                <MapPinIcon />
+                <MapPinIcon className="h-5 w-5 shrink-0" />
                 <span className="text-sm text-muted-foreground">
                   Минская обл., Минский р-н, д. Обчак, ул. Западная
                 </span>
               </div>
               <div className="flex items-start gap-3">
-                <ClockIcon />
-                <span className="text-sm text-muted-foreground">Пн-Сб: 9:00 - 18:00</span>
+                <ClockIcon className="h-5 w-5 shrink-0" />
+                <span className="text-sm text-muted-foreground">Пн-Пт: 9:00 - 18:00, Сб: 9:00 - 17:00</span>
               </div>
             </div>
           </div>

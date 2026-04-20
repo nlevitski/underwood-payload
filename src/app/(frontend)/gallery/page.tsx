@@ -37,7 +37,7 @@ export default function GalleryPage() {
           </nav>
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">Фото питомника</h1>
           <p className="mt-2 text-muted-foreground">
-            Реальные фотографии наших полей и растений
+            Реальные фотографии наших полей и растений... скоро будут загружены
           </p>
         </div>
       </section>
@@ -52,9 +52,7 @@ export default function GalleryPage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
                 className={`overflow-hidden rounded-xl shadow-card ${
-                  index === 0
-                    ? 'aspect-[2.05/1] sm:col-span-2 lg:col-span-2'
-                    : 'aspect-square'
+                  index === 0 ? 'aspect-[2.05/1] sm:col-span-2 lg:col-span-2' : 'aspect-square'
                 }`}
               >
                 <img
