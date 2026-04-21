@@ -35,7 +35,8 @@ export const ProductItems: CollectionConfig = {
       type: 'array',
       virtual: true,
       admin: {
-        description: 'Edit item attributes inline. Values are stored in Product Item Attributes collection.',
+        description:
+          'Edit item attributes inline. Values are stored in Product Item Attributes collection.',
         initCollapsed: true,
       },
       fields: [
