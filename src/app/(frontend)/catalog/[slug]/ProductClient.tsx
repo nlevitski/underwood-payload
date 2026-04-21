@@ -6,15 +6,9 @@ import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { Product, AgeType, SizeType, AgePostfix, SizePostfix } from '../products'
+import type { Product, ProductVariant } from '../products'
 
-type VariantWithValue = {
-  id: number
-  price: number
-  inStock: boolean
-  value: AgeType | SizeType
-  postfix: AgePostfix | SizePostfix
-}
+type VariantWithValue = Extract<ProductVariant, { value: string }>
 
 const valueMap = {
   size: 'Размер',
@@ -22,8 +16,11 @@ const valueMap = {
 }
 
 export function ProductClient({ product }: { product: Product }) {
-  const [potId, setPotId] = useState<number>(product.pots[0].id)
-  const [variantId, setVariantId] = useState(product.pots[0].variants[0].id)
+  const initialVariant = product.variants[0]
+  const initialPot = initialVariant?.pots[0]
+
+  const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
+  const [potId, setPotId] = useState<number>(initialPot?.id ?? 0)
 
   // Hover states
   const [hoveredPotId, setHoveredPotId] = useState<number | null>(null)
@@ -33,35 +30,39 @@ export function ProductClient({ product }: { product: Product }) {
   const displayPotId = hoveredPotId ?? potId
   const displayVariantId = hoveredVariantId ?? variantId
 
-  const currentPot = product.pots.find((p) => p.id === displayPotId)!
-  const currentVariant = currentPot.variants.find((v) => v.id === displayVariantId)!
+  const currentVariant =
+    product.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
+  const currentPot = currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
 
-  const togglePot = (id: number) => {
-    const newCurrentPot = product.pots.find((p) => p.id === id)!
-    const newCurVariantId = newCurrentPot.variants[0].id
-    setPotId(newCurrentPot.id)
-    setVariantId(newCurVariantId)
+  if (!currentVariant || !currentPot) {
+    return null
+  }
+
+  const toggleVariant = (id: number) => {
+    const nextVariant = product.variants.find((variant) => variant.id === id)
+    if (!nextVariant) return
+
+    setVariantId(nextVariant.id)
+    setPotId(nextVariant.pots[0]?.id ?? 0)
+    setHoveredPotId(null)
+    setHoveredVariantId(null)
+  }
+
+  const handleVariantHover = (id: number) => {
+    const hoveredVariant = product.variants.find((variant) => variant.id === id)
+    if (!hoveredVariant) return
+
+    setHoveredVariantId(id)
+    setHoveredPotId(hoveredVariant.pots[0]?.id ?? null)
+  }
+
+  const clearHoverSelection = () => {
     setHoveredPotId(null)
     setHoveredVariantId(null)
   }
 
   const handlePotHover = (id: number) => {
     setHoveredPotId(id)
-    const hoveredPot = product.pots.find((p) => p.id === id)!
-    setHoveredVariantId(hoveredPot.variants[0].id)
-  }
-
-  const handlePotLeave = () => {
-    setHoveredPotId(null)
-    setHoveredVariantId(null)
-  }
-
-  const handleVariantHover = (id: number) => {
-    setHoveredVariantId(id)
-  }
-
-  const handleVariantLeave = () => {
-    setHoveredVariantId(null)
   }
 
   return (
@@ -93,72 +94,76 @@ export function ProductClient({ product }: { product: Product }) {
 
         <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-        {/* Pot selector */}
-        <div>
-          <span className="text-sm font-medium text-foreground mb-2 block">Объём горшка</span>
-          <div className="flex flex-wrap gap-1.5">
-            {product.pots.map((pot) => (
-              <button
-                key={pot.id}
-                type="button"
-                onClick={() => togglePot(pot.id)}
-                onMouseEnter={() => handlePotHover(pot.id)}
-                onMouseLeave={handlePotLeave}
-                aria-label={pot.name}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  pot.id === potId
-                    ? 'bg-forest text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-accent'
-                }`}
-              >
-                {pot.name}
-              </button>
-            ))}
-          </div>
-        </div>
+        <div onMouseLeave={clearHoverSelection}>
+          {product.valueType !== 'none' && (
+            <div>
+              <span className="text-sm font-medium text-foreground mb-2 block">
+                {valueMap[product.valueType]}
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {product.variants.map((variant) => {
+                  const variantWithValue = variant as VariantWithValue
 
-        {/* Value selector (age/size) - only if not 'none' */}
-        {product.valueType !== 'none' && (
-          <div>
-            <span className="text-sm font-medium text-foreground mb-2 block">
-              {valueMap[product.valueType]}
-            </span>
+                  return (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      onClick={() => {
+                        toggleVariant(variant.id)
+                      }}
+                      onMouseEnter={() => handleVariantHover(variant.id)}
+                      aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                        variant.id === variantId
+                          ? 'bg-forest text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                      }`}
+                    >
+                      {`${variantWithValue.value} ${variantWithValue.postfix}`}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4">
+            <span className="text-sm font-medium text-foreground mb-2 block">Горшок</span>
             <div className="flex flex-wrap gap-1.5">
-              {(currentPot.variants as VariantWithValue[]).map((v) => (
+              {currentVariant.pots.map((pot) => (
                 <button
-                  key={v.id}
+                  key={pot.id}
                   type="button"
                   onClick={() => {
-                    setVariantId(v.id)
-                    setHoveredVariantId(null)
+                    setPotId(pot.id)
+                    setHoveredPotId(null)
                   }}
-                  onMouseEnter={() => handleVariantHover(v.id)}
-                  onMouseLeave={handleVariantLeave}
-                  aria-label={`${v.value} ${v.postfix}`}
+                  onMouseEnter={() => handlePotHover(pot.id)}
+                  aria-label={pot.name}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    v.id === variantId
+                    pot.id === displayPotId
                       ? 'bg-forest text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
-                  {`${v.value} ${v.postfix}`}
+                  {pot.name}
                 </button>
               ))}
             </div>
           </div>
-        )}
+        </div>
 
         {/* Price & Stock */}
         <div className="flex items-center gap-6 pt-2">
-          <span className="text-3xl font-bold text-foreground">{currentVariant.price} BYN</span>
+          <span className="text-3xl font-bold text-foreground">{currentPot.price} BYN</span>
           <span
             className={`text-sm font-medium px-3 py-1.5 rounded-full ${
-              currentVariant.inStock
+              currentPot.inStock
                 ? 'bg-accent text-accent-foreground'
                 : 'bg-muted text-muted-foreground'
             }`}
           >
-            {currentVariant.inStock ? 'В наличии' : 'Под заказ'}
+            {currentPot.inStock ? 'В наличии' : 'Под заказ'}
           </span>
         </div>
 

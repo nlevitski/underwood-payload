@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react'
+import Image from 'next/image'
 import * as motion from 'motion/react-client'
 
 import { Button } from '@/components/ui/button'
@@ -94,7 +95,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               transition={{ duration: 0.4, delay: 0.1 }}
               className="mb-10 aspect-[16/9] overflow-hidden rounded-2xl shadow-card"
             >
-              <img src={post.image} alt={post.title} className="h-full w-full object-cover" />
+              <div className="relative h-full w-full">
+                <Image
+                  src={post.image}
+                  alt={post.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 768px"
+                />
+              </div>
             </motion.div>
 
             <motion.div

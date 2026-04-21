@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import * as motion from 'motion/react-client'
 import nurseryRowsImage from '@/assets/nursery-rows.jpg'
 export function About() {
@@ -45,11 +46,15 @@ export function About() {
             transition={{ duration: 0.5 }}
             className="relative"
           >
-            <img
-              src={nurseryRowsImage.src}
-              alt="Ряды растений в питомнике"
-              className="rounded-2xl shadow-elevated w-full"
-            />
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-elevated">
+              <Image
+                src={nurseryRowsImage}
+                alt="Ряды растений в питомнике"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
           </motion.div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import * as motion from 'motion/react-client'
+import Image from 'next/image'
 
 import nurseryRowsImage from '@/assets/nursery-rows.jpg'
 
@@ -41,11 +42,15 @@ export function AboutStory() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <img
-              src={nurseryRowsImage.src}
-              alt="Ряды растений"
-              className="rounded-2xl shadow-elevated"
-            />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-elevated">
+              <Image
+                src={nurseryRowsImage}
+                alt="Ряды растений"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
           </motion.div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
@@ -62,7 +63,7 @@ export function Hero({
   return (
     <section className={cn('relative flex items-center', heightClassName)}>
       <div className="absolute inset-0">
-        <img src={imageSrc} alt={imageAlt} className="h-full w-full object-cover" />
+        <Image src={imageSrc} alt={imageAlt} fill className="object-cover" priority />
         <div className={cn('absolute inset-0', overlayClassName)} />
       </div>
       <div className={cn('container relative z-10', containerPaddingClassName)}>

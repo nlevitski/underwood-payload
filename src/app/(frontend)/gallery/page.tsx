@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import * as motion from 'motion/react-client'
 
 import heroImage from '@/assets/hero-nursery.jpg'
@@ -55,11 +56,15 @@ export default function GalleryPage() {
                   index === 0 ? 'aspect-[2.05/1] sm:col-span-2 lg:col-span-2' : 'aspect-square'
                 }`}
               >
-                <img
-                  src={image.src.src}
-                  alt={image.alt}
-                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                />
+                <div className="relative h-full w-full">
+                  <Image
+                    src={image.src}
+                    alt={image.alt}
+                    fill
+                    className="object-cover transition-transform duration-500 hover:scale-105"
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                  />
+                </div>
               </motion.div>
             ))}
           </div>

@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 interface CategoryCardProps {
@@ -15,11 +16,15 @@ export function CategoryCard({ title, description, image, href }: CategoryCardPr
         href={href}
         className="group relative block overflow-hidden rounded-2xl aspect-[4/3] shadow-card hover:shadow-elevated transition-all duration-300"
       >
-        <img
-          src={image}
-          alt={title}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-        />
+        <div className="absolute inset-0">
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
         <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/30 to-transparent" />
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <h3 className="text-xl md:text-2xl font-bold text-primary-foreground mb-1">{title}</h3>

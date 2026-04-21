@@ -2,28 +2,25 @@
 
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import { Product, AgeType, SizeType, AgePostfix, SizePostfix } from '../../catalog/products'
 import { StaticImageData } from 'next/image'
 import { useState } from 'react'
 import Link from 'next/link'
+import type { Product, ProductVariant } from '../../catalog/products'
 
 const valueMap = {
   size: 'Размер',
   age: 'Возраст',
-}
+} as const
 
-type VariantWithValue = {
-  id: number
-  price: number
-  inStock: boolean
-  value: AgeType | SizeType
-  postfix: AgePostfix | SizePostfix
-}
+type VariantWithValue = Extract<ProductVariant, { value: string }>
 
 export function PlantCard(props: Product & { image: StaticImageData }) {
+  const initialVariant = props.variants[0]
+  const initialPot = initialVariant?.pots[0]
+
   // Selected (clicked) values
-  const [potId, setPotId] = useState<number>(props.pots[0].id)
-  const [variantId, setVariantId] = useState(props.pots[0].variants[0].id)
+  const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
+  const [potId, setPotId] = useState<number>(initialPot?.id ?? 0)
 
   // Hover states
   const [hoveredPotId, setHoveredPotId] = useState<number | null>(null)
@@ -33,42 +30,43 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
   const displayPotId = hoveredPotId ?? potId
   const displayVariantId = hoveredVariantId ?? variantId
 
-  const currentPot = props.pots.find((p) => p.id === displayPotId)!
-  const curVariant = currentPot.variants.find((v) => v.id === displayVariantId)!
+  const currentVariant = props.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
+  const currentPot = currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
 
-  const togglePot = (id: number) => {
-    const newCurrentPot = props.pots.find((p) => p.id === id)!
-    const newCurVariantId = newCurrentPot.variants[0].id
-    setPotId(newCurrentPot.id)
-    setVariantId(newCurVariantId)
+  if (!currentVariant || !currentPot) {
+    return null
+  }
+
+  const toggleVariant = (id: number) => {
+    const nextVariant = props.variants.find((variant) => variant.id === id)
+    if (!nextVariant) return
+
+    const nextPot = nextVariant.pots[0]
+    setVariantId(nextVariant.id)
+    setPotId(nextPot?.id ?? 0)
+    setHoveredPotId(null)
+    setHoveredVariantId(null)
+  }
+
+  const handleVariantHover = (id: number) => {
+    const hoveredVariant = props.variants.find((variant) => variant.id === id)
+    if (!hoveredVariant) return
+
+    setHoveredVariantId(id)
+    setHoveredPotId(hoveredVariant.pots[0]?.id ?? null)
+  }
+
+  const clearHoverSelection = () => {
     setHoveredPotId(null)
     setHoveredVariantId(null)
   }
 
   const handlePotHover = (id: number) => {
     setHoveredPotId(id)
-    const hoveredPot = props.pots.find((p) => p.id === id)!
-    setHoveredVariantId(hoveredPot.variants[0].id)
   }
 
-  const handlePotLeave = () => {
-    setHoveredPotId(null)
-    setHoveredVariantId(null)
-  }
-
-  const handleVariantHover = (id: number) => {
-    setHoveredVariantId(id)
-  }
-
-  const handleVariantLeave = () => {
-    setHoveredVariantId(null)
-  }
   return (
     <div className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card">
-      {/* <Link
-        href={`/catalog/${props.id}`}
-        className="group block overflow-hidden rounded-xl bg-card shadow-soft hover:shadow-card transition-all duration-300"
-      > */}
       <div className="aspect-square overflow-hidden relative">
         <Image
           src={props.image}
@@ -85,71 +83,73 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
           {props.name}
         </h3>
 
-        {/* Pot selection */}
-        <div>
-          <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
-          <div className="flex flex-wrap gap-1.5">
-            {props.pots.map((pot) => (
-              <button
-                key={pot.name}
-                type="button"
-                onClick={() => {
-                  togglePot(pot.id)
-                }}
-                onMouseEnter={() => handlePotHover(pot.id)}
-                onMouseLeave={handlePotLeave}
-                aria-label={pot.name}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                  pot.id === potId
-                    ? 'bg-forest text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-accent'
-                }`}
-              >
-                {pot.name}
-              </button>
-            ))}
-          </div>
-        </div>
+        <div onMouseLeave={clearHoverSelection}>
+          {props.valueType !== 'none' && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1.5 block">
+                {valueMap[props.valueType]}
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {props.variants.map((variant) => {
+                  const variantWithValue = variant as VariantWithValue
 
-        {/* Value selection (age/size) - only if not 'none' */}
-        {props.valueType !== 'none' && (
-          <div>
-            <p className="text-xs text-muted-foreground mb-1.5 block">{`${valueMap[props.valueType]}`}</p>
+                  return (
+                    <button
+                      key={variant.id}
+                      type="button"
+                      onClick={() => {
+                        toggleVariant(variant.id)
+                      }}
+                      onMouseEnter={() => handleVariantHover(variant.id)}
+                      aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
+                        variant.id === variantId
+                          ? 'bg-forest text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                      }`}
+                    >
+                      {`${variantWithValue.value} ${variantWithValue.postfix}`}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="mt-3">
+            <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
             <div className="flex flex-wrap gap-1.5">
-              {(currentPot.variants as VariantWithValue[]).map((v) => (
+              {currentVariant.pots.map((pot) => (
                 <button
-                  key={v.id}
+                  key={pot.id}
                   type="button"
                   onClick={() => {
-                    setVariantId(v.id)
-                    setHoveredVariantId(null)
+                    setPotId(pot.id)
+                    setHoveredPotId(null)
                   }}
-                  onMouseEnter={() => handleVariantHover(v.id)}
-                  onMouseLeave={handleVariantLeave}
-                  aria-label={`${v.value} ${v.postfix}`}
+                  onMouseEnter={() => handlePotHover(pot.id)}
+                  aria-label={pot.name}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    v.id === variantId
+                    pot.id === displayPotId
                       ? 'bg-forest text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
-                  {`${v.value} ${v.postfix}`}
+                  {pot.name}
                 </button>
               ))}
             </div>
           </div>
-        )}
+        </div>
 
         <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-base font-bold text-foreground">{curVariant.price} BYN</span>
+          <span className="text-base font-bold text-foreground">{currentPot.price} BYN</span>
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              curVariant.inStock
-                ? 'bg-accent text-accent-foreground'
-                : 'bg-muted text-muted-foreground'
+              currentPot.inStock ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'
             }`}
           >
-            {curVariant.inStock ? 'В наличии' : 'Под заказ'}
+            {currentPot.inStock ? 'В наличии' : 'Под заказ'}
           </span>
         </div>
         <Link href={`/catalog/${props.id}`}>
@@ -159,7 +159,6 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
           </div>
         </Link>
       </div>
-      {/* </Link> */}
     </div>
   )
 }

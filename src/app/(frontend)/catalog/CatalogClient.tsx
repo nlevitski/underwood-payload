@@ -162,11 +162,11 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
 
     products.forEach((product) => {
       categoryKeys.add(product.categoryKey)
-      product.pots.forEach((pot) => {
-        pots.add(pot.name)
-        pot.variants.forEach((variant) => {
-          if (variant.price < min) min = variant.price
-          if (variant.price > max) max = variant.price
+      product.variants.forEach((variant) => {
+        variant.pots.forEach((pot) => {
+          pots.add(pot.name)
+          if (pot.price < min) min = pot.price
+          if (pot.price > max) max = pot.price
         })
       })
     })
@@ -209,6 +209,9 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
   )
   const [selectedPots, setSelectedPots] = useState<string[]>(initialState.selectedPots)
   const [priceRange, setPriceRange] = useState<[number, number]>(initialState.priceRange)
+  const [appliedPriceRange, setAppliedPriceRange] = useState<[number, number]>(
+    initialState.priceRange,
+  )
   const [inStockOnly, setInStockOnly] = useState(initialState.inStockOnly)
   const [perPage, setPerPage] = useState<number>(initialState.perPage)
   const [page, setPage] = useState<number>(initialState.page)
@@ -231,23 +234,31 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
   )
   const lastSyncedQueryRef = useRef(initialQuery)
 
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setAppliedPriceRange(priceRange)
+    }, 300)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [priceRange])
+
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       if (selectedCategories.length > 0 && !selectedCategories.includes(product.categoryKey)) {
         return false
       }
 
-      return product.pots.some((pot) => {
-        if (selectedPots.length > 0 && !selectedPots.includes(pot.name)) {
-          return false
-        }
-
-        return pot.variants.some((variant) => {
-          if (variant.price < priceRange[0] || variant.price > priceRange[1]) {
+      return product.variants.some((variant) => {
+        return variant.pots.some((pot) => {
+          if (selectedPots.length > 0 && !selectedPots.includes(pot.name)) {
             return false
           }
 
-          if (inStockOnly && !variant.inStock) {
+          if (pot.price < appliedPriceRange[0] || pot.price > appliedPriceRange[1]) {
+            return false
+          }
+
+          if (inStockOnly && !pot.inStock) {
             return false
           }
 
@@ -255,7 +266,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
         })
       })
     })
-  }, [selectedCategories, selectedPots, priceRange, inStockOnly])
+  }, [selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / perPage))
 
@@ -267,7 +278,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
 
   useEffect(() => {
     const nextQuery = buildSearchParamsFromState(
-      { selectedCategories, selectedPots, priceRange, inStockOnly, perPage, page },
+      { selectedCategories, selectedPots, priceRange: appliedPriceRange, inStockOnly, perPage, page },
       minPrice,
       maxPrice,
     )
@@ -286,7 +297,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
     page,
     pathname,
     perPage,
-    priceRange,
+    appliedPriceRange,
     router,
     selectedCategories,
     selectedPots,
@@ -340,6 +351,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
     setSelectedCategories([])
     setSelectedPots([])
     setPriceRange([minPrice, maxPrice])
+    setAppliedPriceRange([minPrice, maxPrice])
     setInStockOnly(false)
     setPage(1)
   }

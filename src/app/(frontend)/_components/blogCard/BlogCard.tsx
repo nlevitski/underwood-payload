@@ -1,4 +1,5 @@
 import { ArrowRight, Calendar } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 interface BlogCardProps {
@@ -18,11 +19,15 @@ export function BlogCard({ id, title, excerpt, image, date, category }: BlogCard
         className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card"
       >
         <div className="aspect-[16/10] overflow-hidden">
-          <img
-            src={image}
-            alt={title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          <div className="relative h-full w-full">
+            <Image
+              src={image}
+              alt={title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </div>
         </div>
         <div className="flex h-full flex-1 flex-col p-5">
           <div className="flex items-center gap-3 text-xs text-muted-foreground">

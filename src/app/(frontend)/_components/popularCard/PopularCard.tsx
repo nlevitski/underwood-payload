@@ -1,5 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 interface PopularCardProps {
@@ -22,11 +23,15 @@ export function PopularCard(props: PopularCardProps) {
         className="group block overflow-hidden rounded-xl bg-card shadow-soft hover:shadow-card transition-all duration-300"
       >
         <div className="aspect-square overflow-hidden">
-          <img
-            src={props.image}
-            alt={props.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
+          <div className="relative h-full w-full">
+            <Image
+              src={props.image}
+              alt={props.name}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, 25vw"
+            />
+          </div>
         </div>
         <div className="p-4 space-y-2">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">

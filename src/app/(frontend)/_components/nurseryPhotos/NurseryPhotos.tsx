@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import * as motion from 'motion/react-client'
 
 import heroImage from '@/assets/hero-nursery.jpg'
@@ -26,11 +27,15 @@ export function NurseryPhotos() {
           transition={{ duration: 0.5 }}
         >
           <Link href="/gallery" className="block relative group overflow-hidden rounded-2xl">
-            <img
-              src={heroImage.src}
-              alt="Панорама питомника"
-              className="w-full aspect-[21/9] object-cover transition-transform duration-700 group-hover:scale-105"
-            />
+            <div className="relative aspect-[21/9] w-full overflow-hidden">
+              <Image
+                src={heroImage}
+                alt="Панорама питомника"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                sizes="100vw"
+              />
+            </div>
             <div className="absolute inset-0 bg-foreground/20 group-hover:bg-foreground/30 transition-colors" />
             <div className="absolute inset-0 flex items-center justify-center">
               <span className="bg-background/90 backdrop-blur px-6 py-3 rounded-lg font-medium text-foreground shadow-card group-hover:bg-background transition-colors">

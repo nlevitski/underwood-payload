@@ -1,4 +1,4 @@
-import { Award, Leaf, TreePine, Users } from 'lucide-react'
+import { Leaf, TreePine, Users } from 'lucide-react'
 import * as motion from 'motion/react-client'
 
 const values = [
