@@ -4,7 +4,7 @@ export const ProductCategories: CollectionConfig = {
   slug: 'product-categories',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug', 'group'],
+    defaultColumns: ['name', 'nameRu', 'slug', 'group'],
   },
   fields: [
     {
@@ -16,6 +16,11 @@ export const ProductCategories: CollectionConfig = {
     },
     {
       name: 'name',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'nameRu',
       type: 'text',
       required: true,
     },

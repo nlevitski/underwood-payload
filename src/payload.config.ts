@@ -15,6 +15,8 @@ import { ProductItems } from './collections/ProductItems/config'
 import { ProductVariants } from './collections/ProductVariants/config'
 import { ProductItemAttributes } from './collections/ProductItemAttributes/config'
 import { ProductAges } from './collections/ProductAges/config'
+import { ProductSizes } from './collections/ProductSizes/config'
+import { ProductVariantTypes } from './collections/ProductVariantTypes/config'
 import { Articles } from './collections/Articles/config'
 import { env } from './lib/env'
 import { ArticleAuthors } from './collections/ArticleAuthors/config'
@@ -39,12 +41,14 @@ export default buildConfig({
     Media,
     ProductGroups,
     ProductCategories,
-    ProductAttributes,
-    ProductAges,
     ProductItems,
-    ProductVariants,
+    ProductAttributes,
     ProductItemAttributes,
+    ProductSizes,
+    ProductAges,
     Pots,
+    ProductVariantTypes,
+    ProductVariants,
     Articles,
     ArticleAuthors,
     {

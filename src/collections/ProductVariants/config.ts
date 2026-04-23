@@ -1,29 +1,91 @@
 import type { CollectionConfig } from 'payload'
 import { setDefaultPotHook } from '@/hooks/set-default-pot.hook'
+import { resolveRelationId } from '@/hooks/resolve-relation-id'
+import { syncVariantSelectionHook } from './hooks/sync-variant-selection.hook'
 import { syncAvailabilityHook } from './hooks/sync-availability.hook'
 import { validateUniqueCombinationHook } from './hooks/validate-unique-combination.hook'
 import { generateSkuHook } from './hooks/generate-sku.hook'
+import { syncCategoryHook } from './hooks/sync-category.hook'
+
+const variantTypeOptions = [
+  { label: 'Нет', value: 'none' },
+  { label: 'Размер', value: 'size' },
+  { label: 'Возраст', value: 'age' },
+]
 
 export const ProductVariants: CollectionConfig = {
   slug: 'product-variants',
   admin: {
     useAsTitle: 'sku',
-    defaultColumns: ['sku', 'item', 'age', 'pot', 'price', 'stockQty', 'isAvailable'],
+    defaultColumns: [
+      'sku',
+      'category',
+      'item',
+      'variantType',
+      'age',
+      'size',
+      'pot',
+      'price',
+      'stockQty',
+      'isAvailable',
+    ],
   },
   fields: [
+    {
+      name: 'variantType',
+      label: 'Тип варианта',
+      type: 'select',
+      required: true,
+      defaultValue: 'none',
+      index: true,
+      options: variantTypeOptions,
+    },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'product-categories',
+      required: true,
+      index: true,
+    },
     {
       name: 'item',
       type: 'relationship',
       relationTo: 'product-items',
       required: true,
       index: true,
+      filterOptions: ({ data }) => {
+        const categoryId = resolveRelationId(data?.category)
+
+        if (!categoryId) {
+          return false
+        }
+
+        return {
+          category: {
+            equals: categoryId,
+          },
+        }
+      },
     },
     {
       name: 'age',
       type: 'relationship',
       relationTo: 'product-ages',
-      required: true,
+      required: false,
       index: true,
+      admin: {
+        condition: (_, siblingData) => siblingData?.variantType === 'age',
+      },
+    },
+    {
+      name: 'size',
+      type: 'relationship',
+      relationTo: 'product-sizes',
+      required: false,
+      index: true,
+      admin: {
+        condition: (_, siblingData) => siblingData?.variantType === 'size',
+      },
     },
     {
       name: 'pot',
@@ -73,7 +135,7 @@ export const ProductVariants: CollectionConfig = {
     },
   ],
   hooks: {
-    beforeValidate: [generateSkuHook],
+    beforeValidate: [syncCategoryHook, syncVariantSelectionHook, generateSkuHook],
     beforeChange: [validateUniqueCombinationHook, syncAvailabilityHook],
   },
 }

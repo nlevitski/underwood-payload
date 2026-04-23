@@ -9,13 +9,16 @@ import { seedProductCategories } from './seeders/product-categories.seeder'
 import { seedPots } from './seeders/pots.seeder'
 import { seedProductAttributes } from './seeders/product-attributes.seeder'
 import { seedProductAges } from './seeders/product-ages.seeder'
+import { seedProductSizes } from './seeders/product-sizes.seeder'
 import { seedProductItems } from './seeders/product-items.seeder'
+import { seedProductVariantTypes } from './seeders/product-variant-types.seeder'
 import { seedProductVariants } from './seeders/product-variants.seeder'
 import { seedProductItemAttributes } from './seeders/product-item-attributes.seeder'
 
 process.env.PAYLOAD_MIGRATING ??= process.env.SEED_DISABLE_SCHEMA_PUSH === 'true' ? 'true' : 'false'
 if (process.env.NODE_ENV !== 'production') {
-  process.env.PAYLOAD_DROP_DATABASE ??= process.env.SEED_DROP_DATABASE === 'false' ? 'false' : 'true'
+  process.env.PAYLOAD_DROP_DATABASE ??=
+    process.env.SEED_DROP_DATABASE === 'false' ? 'false' : 'true'
 }
 
 async function main() {
@@ -34,8 +37,13 @@ async function main() {
     await seedProductGroups(payload)
     await seedProductCategories(payload)
     await seedProductAttributes(payload)
-    await seedProductAges(payload)
-    await seedPots(payload)
+    await Promise.all([
+      seedProductAges(payload),
+      seedProductSizes(payload),
+      seedProductVariantTypes(payload),
+      seedPots(payload),
+    ])
+
     await seedProductItems(payload)
     await seedProductItemAttributes(payload)
     await seedProductVariants(payload)

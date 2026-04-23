@@ -45,6 +45,10 @@ type CatalogState = {
   page: number
 }
 
+function normalizePotCode(value: string) {
+  return value.trim().toUpperCase()
+}
+
 function splitQueryValue(value: string) {
   return value
     .split(',')
@@ -84,12 +88,14 @@ function buildStateFromSearchParams(
   potVolumes: string[],
 ): CatalogState {
   const categorySet = new Set(categoryKeys)
-  const potSet = new Set(potVolumes)
+  const potSet = new Set(potVolumes.map(normalizePotCode))
 
   const selectedCategories = readListParam(searchParams.category).filter((key) =>
     categorySet.has(key),
   )
-  const selectedPots = readListParam(searchParams.pot).filter((pot) => potSet.has(pot))
+  const selectedPots = readListParam(searchParams.pot)
+    .map(normalizePotCode)
+    .filter((pot) => potSet.has(pot))
 
   const rawMin = readNumberParam(searchParams.priceMin, minPrice)
   const rawMax = readNumberParam(searchParams.priceMax, maxPrice)
@@ -164,7 +170,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
       categoryKeys.add(product.categoryKey)
       product.variants.forEach((variant) => {
         variant.pots.forEach((pot) => {
-          pots.add(pot.name)
+          pots.add(normalizePotCode(pot.name))
           if (pot.price < min) min = pot.price
           if (pot.price > max) max = pot.price
         })
@@ -250,7 +256,9 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
 
       return product.variants.some((variant) => {
         return variant.pots.some((pot) => {
-          if (selectedPots.length > 0 && !selectedPots.includes(pot.name)) {
+          const potCode = normalizePotCode(pot.name)
+
+          if (selectedPots.length > 0 && !selectedPots.includes(potCode)) {
             return false
           }
 
@@ -267,6 +275,50 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
       })
     })
   }, [selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
+
+  const getInitialSelection = (product: (typeof products)[number]) => {
+    const matchingPotCode = selectedPots.find((selectedPot) =>
+      product.variants.some((variant) =>
+        variant.pots.some((pot) => normalizePotCode(pot.name) === selectedPot),
+      ),
+    )
+
+    const initialVariant =
+      (matchingPotCode
+        ? product.variants.find((variant) =>
+            variant.pots.some((pot) => normalizePotCode(pot.name) === matchingPotCode),
+          )
+        : undefined) ?? product.variants[0]
+
+    const initialPot =
+      initialVariant?.pots.find((pot) =>
+        matchingPotCode ? normalizePotCode(pot.name) === matchingPotCode : true,
+      ) ?? initialVariant?.pots[0]
+
+    return {
+      initialVariantId: initialVariant?.id,
+      initialPotId: initialPot?.id,
+    }
+  }
+
+  const getDisplayProduct = (product: (typeof products)[number]) => {
+    if (selectedPots.length === 0) {
+      return product
+    }
+
+    const matchingVariants = product.variants.filter((variant) =>
+      variant.pots.some((pot) => selectedPots.includes(normalizePotCode(pot.name))),
+    )
+
+    if (matchingVariants.length === 0) {
+      return product
+    }
+
+    return {
+      ...product,
+      variants: matchingVariants,
+    }
+  }
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / perPage))
 
@@ -532,9 +584,17 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
                   </div>
 
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {paginatedProducts.map((product) => (
-                      <PlantCard key={product.id} {...product} />
-                    ))}
+                    {paginatedProducts.map((product) => {
+                      const displayProduct = getDisplayProduct(product)
+
+                      return (
+                        <PlantCard
+                          key={`${product.id}-${selectedPots.join(',')}`}
+                          {...displayProduct}
+                          {...getInitialSelection(displayProduct)}
+                        />
+                      )
+                    })}
                   </div>
 
                   {totalPages > 1 && (

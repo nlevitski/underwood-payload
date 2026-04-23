@@ -10,6 +10,13 @@ export const ProductGroups: CollectionConfig = {
   fields: [
     {
       name: 'name',
+      label: 'Name',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'nameRu',
+      label: 'Название',
       type: 'text',
       required: true,
     },

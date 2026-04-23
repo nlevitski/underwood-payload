@@ -94,13 +94,21 @@ export async function seedProductItems(payload: Payload) {
       continue
     }
 
-    categoryIdByKey.set(`${groupName}::${category.name}`, category.id)
+    if (typeof category.nameRu === 'string') {
+      categoryIdByKey.set(`${groupName}::${category.nameRu}`, category.id)
+    }
+
+    if (typeof category.name === 'string') {
+      categoryIdByKey.set(`${groupName}::${category.name}`, category.id)
+    }
   }
 
   const slugCounts = new Map<string, number>()
 
   for (const catalogCategory of productCatalog) {
-    const categoryId = categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.category}`)
+    const categoryId =
+      categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.category}`) ??
+      categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.categorySlug}`)
     if (!categoryId) {
       continue
     }
@@ -120,6 +128,7 @@ export async function seedProductItems(payload: Payload) {
         data: {
           category: categoryId,
           name: item.name,
+          nameRu: item.nameRu,
           slug: uniqueSlug,
         },
       })

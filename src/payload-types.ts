@@ -71,12 +71,14 @@ export interface Config {
     media: Media;
     'product-groups': ProductGroup;
     'product-categories': ProductCategory;
-    'product-attributes': ProductAttribute;
-    'product-ages': ProductAge;
     'product-items': ProductItem;
-    'product-variants': ProductVariant;
+    'product-attributes': ProductAttribute;
     'product-item-attributes': ProductItemAttribute;
+    'product-sizes': ProductSize;
+    'product-ages': ProductAge;
     pots: Pot;
+    'product-variant-types': ProductVariantType;
+    'product-variants': ProductVariant;
     articles: Article;
     'article-authors': ArticleAuthor;
     pages: Page;
@@ -93,12 +95,14 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'product-groups': ProductGroupsSelect<false> | ProductGroupsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
-    'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
-    'product-ages': ProductAgesSelect<false> | ProductAgesSelect<true>;
     'product-items': ProductItemsSelect<false> | ProductItemsSelect<true>;
-    'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
+    'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
     'product-item-attributes': ProductItemAttributesSelect<false> | ProductItemAttributesSelect<true>;
+    'product-sizes': ProductSizesSelect<false> | ProductSizesSelect<true>;
+    'product-ages': ProductAgesSelect<false> | ProductAgesSelect<true>;
     pots: PotsSelect<false> | PotsSelect<true>;
+    'product-variant-types': ProductVariantTypesSelect<false> | ProductVariantTypesSelect<true>;
+    'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-authors': ArticleAuthorsSelect<false> | ArticleAuthorsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -192,6 +196,7 @@ export interface Media {
 export interface ProductGroup {
   id: number;
   name: string;
+  nameRu: string;
   slug: string;
   updatedAt: string;
   createdAt: string;
@@ -204,31 +209,8 @@ export interface ProductCategory {
   id: number;
   group: number | ProductGroup;
   name: string;
+  nameRu: string;
   slug: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-attributes".
- */
-export interface ProductAttribute {
-  id: number;
-  category: number | ProductCategory;
-  label: string;
-  key: string;
-  dataType: 'text' | 'number' | 'boolean';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-ages".
- */
-export interface ProductAge {
-  id: number;
-  label: string;
-  months: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -240,6 +222,7 @@ export interface ProductItem {
   id: number;
   category: number | ProductCategory;
   name: string;
+  nameRu: string;
   slug: string;
   /**
    * Edit item attributes inline. Values are stored in Product Item Attributes collection.
@@ -260,20 +243,48 @@ export interface ProductItem {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-variants".
+ * via the `definition` "product-attributes".
  */
-export interface ProductVariant {
+export interface ProductAttribute {
+  id: number;
+  category: number | ProductCategory;
+  label: string;
+  key: string;
+  dataType: 'text' | 'number' | 'boolean';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-item-attributes".
+ */
+export interface ProductItemAttribute {
   id: number;
   item: number | ProductItem;
-  age: number | ProductAge;
-  pot: number | Pot;
-  /**
-   * Generated automatically from item, age, and pot.
-   */
-  sku?: string | null;
-  price: number;
-  stockQty: number;
-  isAvailable: boolean;
+  attribute: number | ProductAttribute;
+  label: string;
+  value: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-sizes".
+ */
+export interface ProductSize {
+  id: number;
+  label: '25-40' | '35-50' | '50-60' | '60-70' | '70-80' | '80' | '80-90' | '90-120';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-ages".
+ */
+export interface ProductAge {
+  id: number;
+  label: string;
+  months: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -295,14 +306,33 @@ export interface Pot {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-item-attributes".
+ * via the `definition` "product-variant-types".
  */
-export interface ProductItemAttribute {
+export interface ProductVariantType {
   id: number;
+  type: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-variants".
+ */
+export interface ProductVariant {
+  id: number;
+  variantType: 'none' | 'size' | 'age';
+  category: number | ProductCategory;
   item: number | ProductItem;
-  attribute: number | ProductAttribute;
-  label: string;
-  value: string;
+  age?: (number | null) | ProductAge;
+  size?: (number | null) | ProductSize;
+  pot: number | Pot;
+  /**
+   * Generated automatically from item, age, and pot.
+   */
+  sku?: string | null;
+  price: number;
+  stockQty: number;
+  isAvailable: boolean;
   updatedAt: string;
   createdAt: string;
 }
@@ -608,28 +638,36 @@ export interface PayloadLockedDocument {
         value: number | ProductCategory;
       } | null)
     | ({
-        relationTo: 'product-attributes';
-        value: number | ProductAttribute;
-      } | null)
-    | ({
-        relationTo: 'product-ages';
-        value: number | ProductAge;
-      } | null)
-    | ({
         relationTo: 'product-items';
         value: number | ProductItem;
       } | null)
     | ({
-        relationTo: 'product-variants';
-        value: number | ProductVariant;
+        relationTo: 'product-attributes';
+        value: number | ProductAttribute;
       } | null)
     | ({
         relationTo: 'product-item-attributes';
         value: number | ProductItemAttribute;
       } | null)
     | ({
+        relationTo: 'product-sizes';
+        value: number | ProductSize;
+      } | null)
+    | ({
+        relationTo: 'product-ages';
+        value: number | ProductAge;
+      } | null)
+    | ({
         relationTo: 'pots';
         value: number | Pot;
+      } | null)
+    | ({
+        relationTo: 'product-variant-types';
+        value: number | ProductVariantType;
+      } | null)
+    | ({
+        relationTo: 'product-variants';
+        value: number | ProductVariant;
       } | null)
     | ({
         relationTo: 'articles';
@@ -740,6 +778,7 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface ProductGroupsSelect<T extends boolean = true> {
   name?: T;
+  nameRu?: T;
   slug?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -751,7 +790,28 @@ export interface ProductGroupsSelect<T extends boolean = true> {
 export interface ProductCategoriesSelect<T extends boolean = true> {
   group?: T;
   name?: T;
+  nameRu?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-items_select".
+ */
+export interface ProductItemsSelect<T extends boolean = true> {
+  category?: T;
+  name?: T;
+  nameRu?: T;
+  slug?: T;
+  itemAttributes?:
+    | T
+    | {
+        attribute?: T;
+        value?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -769,50 +829,6 @@ export interface ProductAttributesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-ages_select".
- */
-export interface ProductAgesSelect<T extends boolean = true> {
-  label?: T;
-  months?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-items_select".
- */
-export interface ProductItemsSelect<T extends boolean = true> {
-  category?: T;
-  name?: T;
-  slug?: T;
-  itemAttributes?:
-    | T
-    | {
-        attribute?: T;
-        value?: T;
-        label?: T;
-        id?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-variants_select".
- */
-export interface ProductVariantsSelect<T extends boolean = true> {
-  item?: T;
-  age?: T;
-  pot?: T;
-  sku?: T;
-  price?: T;
-  stockQty?: T;
-  isAvailable?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-item-attributes_select".
  */
 export interface ProductItemAttributesSelect<T extends boolean = true> {
@@ -820,6 +836,25 @@ export interface ProductItemAttributesSelect<T extends boolean = true> {
   attribute?: T;
   label?: T;
   value?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-sizes_select".
+ */
+export interface ProductSizesSelect<T extends boolean = true> {
+  label?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-ages_select".
+ */
+export interface ProductAgesSelect<T extends boolean = true> {
+  label?: T;
+  months?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -835,6 +870,33 @@ export interface PotsSelect<T extends boolean = true> {
   diameterMaxCm?: T;
   heightMinCm?: T;
   heightMaxCm?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-variant-types_select".
+ */
+export interface ProductVariantTypesSelect<T extends boolean = true> {
+  type?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-variants_select".
+ */
+export interface ProductVariantsSelect<T extends boolean = true> {
+  variantType?: T;
+  category?: T;
+  item?: T;
+  age?: T;
+  size?: T;
+  pot?: T;
+  sku?: T;
+  price?: T;
+  stockQty?: T;
+  isAvailable?: T;
   updatedAt?: T;
   createdAt?: T;
 }

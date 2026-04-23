@@ -14,9 +14,21 @@ const valueMap = {
 
 type VariantWithValue = Extract<ProductVariant, { value: string }>
 
-export function PlantCard(props: Product & { image: StaticImageData }) {
-  const initialVariant = props.variants[0]
-  const initialPot = initialVariant?.pots[0]
+type PlantCardProps = Product & {
+  image: StaticImageData
+  initialVariantId?: number
+  initialPotId?: number
+}
+
+function normalizePotCode(value: string) {
+  return value.trim().toUpperCase()
+}
+
+export function PlantCard(props: PlantCardProps) {
+  const initialVariant =
+    props.variants.find((variant) => variant.id === props.initialVariantId) ?? props.variants[0]
+  const initialPot =
+    initialVariant?.pots.find((pot) => pot.id === props.initialPotId) ?? initialVariant?.pots[0]
 
   // Selected (clicked) values
   const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
@@ -128,14 +140,14 @@ export function PlantCard(props: Product & { image: StaticImageData }) {
                     setHoveredPotId(null)
                   }}
                   onMouseEnter={() => handlePotHover(pot.id)}
-                  aria-label={pot.name}
+                  aria-label={normalizePotCode(pot.name)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                     pot.id === displayPotId
                       ? 'bg-forest text-primary-foreground'
                       : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
-                  {pot.name}
+                  {normalizePotCode(pot.name)}
                 </button>
               ))}
             </div>
