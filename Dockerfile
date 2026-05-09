@@ -3,8 +3,9 @@ FROM node:22.22-slim AS base
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PNPM_HOME=/pnpm
 ENV PATH="${PNPM_HOME}:${PATH}"
+ARG PNPM_VERSION=10.18.3
 
-RUN corepack enable
+RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
 FROM base AS deps
 WORKDIR /app
