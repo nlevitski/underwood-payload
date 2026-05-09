@@ -11,6 +11,7 @@ import { seedProductAttributes } from './seeders/product-attributes.seeder'
 import { seedProductAges } from './seeders/product-ages.seeder'
 import { seedProductSizes } from './seeders/product-sizes.seeder'
 import { seedProductItems } from './seeders/product-items.seeder'
+import { seedProductItemCares } from './seeders/product-item-cares.seeder'
 import { seedProductVariantTypes } from './seeders/product-variant-types.seeder'
 import { seedProductVariants } from './seeders/product-variants.seeder'
 import { seedProductItemAttributes } from './seeders/product-item-attributes.seeder'
@@ -43,8 +44,8 @@ async function main() {
       seedProductVariantTypes(payload),
       seedPots(payload),
     ])
-
     await seedProductItems(payload)
+    await seedProductItemCares(payload)
     await seedProductItemAttributes(payload)
     await seedProductVariants(payload)
     process.exit(0)

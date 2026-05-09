@@ -90,7 +90,7 @@ export const ProductVariants: CollectionConfig = {
     {
       name: 'pot',
       type: 'relationship',
-      relationTo: 'pots',
+      relationTo: 'product-pots',
       required: true,
       index: true,
       hooks: {

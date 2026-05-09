@@ -29,6 +29,9 @@ export function PlantCard(props: PlantCardProps) {
     props.variants.find((variant) => variant.id === props.initialVariantId) ?? props.variants[0]
   const initialPot =
     initialVariant?.pots.find((pot) => pot.id === props.initialPotId) ?? initialVariant?.pots[0]
+  const hasVariantSelection = props.valueType !== 'none'
+  const variantLabel = props.valueType === 'none' ? null : valueMap[props.valueType]
+  const allPots = props.variants.flatMap((variant) => variant.pots)
 
   // Selected (clicked) values
   const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
@@ -43,7 +46,9 @@ export function PlantCard(props: PlantCardProps) {
   const displayVariantId = hoveredVariantId ?? variantId
 
   const currentVariant = props.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
-  const currentPot = currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
+  const currentPot = hasVariantSelection
+    ? currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
+    : allPots.find((pot) => pot.id === displayPotId) ?? allPots[0]
 
   if (!currentVariant || !currentPot) {
     return null
@@ -96,10 +101,10 @@ export function PlantCard(props: PlantCardProps) {
         </h3>
 
         <div onMouseLeave={clearHoverSelection}>
-          {props.valueType !== 'none' && (
+          {hasVariantSelection && (
             <div>
               <p className="text-xs text-muted-foreground mb-1.5 block">
-                {valueMap[props.valueType]}
+                {variantLabel}
               </p>
               <div className="flex flex-wrap gap-1.5">
                 {props.variants.map((variant) => {
@@ -131,7 +136,7 @@ export function PlantCard(props: PlantCardProps) {
           <div className="mt-3">
             <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
             <div className="flex flex-wrap gap-1.5">
-              {currentVariant.pots.map((pot) => (
+              {(hasVariantSelection ? currentVariant.pots : allPots).map((pot) => (
                 <button
                   key={pot.id}
                   type="button"
@@ -142,9 +147,11 @@ export function PlantCard(props: PlantCardProps) {
                   onMouseEnter={() => handlePotHover(pot.id)}
                   aria-label={normalizePotCode(pot.name)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    pot.id === displayPotId
-                      ? 'bg-forest text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-accent'
+                    hoveredPotId === pot.id
+                      ? 'bg-accent text-accent-foreground'
+                      : pot.id === potId
+                        ? 'bg-forest text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {normalizePotCode(pot.name)}

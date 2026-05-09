@@ -32,7 +32,7 @@ export const generateSkuHook: CollectionBeforeValidateHook = async ({ data, oper
       req,
     }),
     req.payload.findByID({
-      collection: 'pots',
+      collection: 'product-pots',
       id: potId,
       depth: 0,
       req,

@@ -2,8 +2,12 @@ import type { CollectionConfig } from 'payload'
 import { generateDisplayNameHook } from './hooks/generate-display-name.hook'
 import { preventDefaultPotDeleteHook } from './hooks/prevent-default-pot-delete.hook'
 
-export const Pots: CollectionConfig = {
-  slug: 'pots',
+export const ProductPots: CollectionConfig = {
+  slug: 'product-pots',
+  labels: {
+    singular: 'Product Pot',
+    plural: 'Product Pots',
+  },
   admin: {
     useAsTitle: 'displayName',
     defaultColumns: [

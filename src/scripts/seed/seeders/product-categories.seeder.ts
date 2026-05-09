@@ -49,7 +49,10 @@ export async function seedProductCategories(payload: Payload) {
       { name: 'Dogwood', nameRu: 'Дёрен' },
       { name: 'Ninebark', nameRu: 'Пузыреплодник' },
     ],
-    perennials: [],
+    perennials: [
+      { name: 'Sage', nameRu: 'Шалфей' },
+      { name: 'Lavander', nameRu: 'Лаванда' },
+    ],
   } as const
   const createOperations = productGroups.flatMap(({ name, id }) => {
     const categories = categoriesMap[name as keyof typeof categoriesMap]

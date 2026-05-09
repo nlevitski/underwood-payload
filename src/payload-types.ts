@@ -72,11 +72,12 @@ export interface Config {
     'product-groups': ProductGroup;
     'product-categories': ProductCategory;
     'product-items': ProductItem;
+    'product-item-cares': ProductItemCare;
     'product-attributes': ProductAttribute;
     'product-item-attributes': ProductItemAttribute;
     'product-sizes': ProductSize;
     'product-ages': ProductAge;
-    pots: Pot;
+    'product-pots': ProductPot;
     'product-variant-types': ProductVariantType;
     'product-variants': ProductVariant;
     articles: Article;
@@ -96,11 +97,12 @@ export interface Config {
     'product-groups': ProductGroupsSelect<false> | ProductGroupsSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     'product-items': ProductItemsSelect<false> | ProductItemsSelect<true>;
+    'product-item-cares': ProductItemCaresSelect<false> | ProductItemCaresSelect<true>;
     'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
     'product-item-attributes': ProductItemAttributesSelect<false> | ProductItemAttributesSelect<true>;
     'product-sizes': ProductSizesSelect<false> | ProductSizesSelect<true>;
     'product-ages': ProductAgesSelect<false> | ProductAgesSelect<true>;
-    pots: PotsSelect<false> | PotsSelect<true>;
+    'product-pots': ProductPotsSelect<false> | ProductPotsSelect<true>;
     'product-variant-types': ProductVariantTypesSelect<false> | ProductVariantTypesSelect<true>;
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
@@ -256,6 +258,20 @@ export interface ProductAttribute {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-item-cares".
+ */
+export interface ProductItemCare {
+  id: number;
+  item: number | ProductItem;
+  watering?: string | null;
+  light?: string | null;
+  temperature?: string | null;
+  size?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-item-attributes".
  */
 export interface ProductItemAttribute {
@@ -290,9 +306,9 @@ export interface ProductAge {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pots".
+ * via the `definition` "product-pots".
  */
-export interface Pot {
+export interface ProductPot {
   id: number;
   displayName?: string | null;
   code: string;
@@ -325,7 +341,7 @@ export interface ProductVariant {
   item: number | ProductItem;
   age?: (number | null) | ProductAge;
   size?: (number | null) | ProductSize;
-  pot: number | Pot;
+  pot: number | ProductPot;
   /**
    * Generated automatically from item, age, and pot.
    */
@@ -642,6 +658,10 @@ export interface PayloadLockedDocument {
         value: number | ProductItem;
       } | null)
     | ({
+        relationTo: 'product-item-cares';
+        value: number | ProductItemCare;
+      } | null)
+    | ({
         relationTo: 'product-attributes';
         value: number | ProductAttribute;
       } | null)
@@ -658,8 +678,8 @@ export interface PayloadLockedDocument {
         value: number | ProductAge;
       } | null)
     | ({
-        relationTo: 'pots';
-        value: number | Pot;
+        relationTo: 'product-pots';
+        value: number | ProductPot;
       } | null)
     | ({
         relationTo: 'product-variant-types';
@@ -817,6 +837,19 @@ export interface ProductItemsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-item-cares_select".
+ */
+export interface ProductItemCaresSelect<T extends boolean = true> {
+  item?: T;
+  watering?: T;
+  light?: T;
+  temperature?: T;
+  size?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-attributes_select".
  */
 export interface ProductAttributesSelect<T extends boolean = true> {
@@ -860,9 +893,9 @@ export interface ProductAgesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pots_select".
+ * via the `definition` "product-pots_select".
  */
-export interface PotsSelect<T extends boolean = true> {
+export interface ProductPotsSelect<T extends boolean = true> {
   displayName?: T;
   code?: T;
   volumeLiters?: T;

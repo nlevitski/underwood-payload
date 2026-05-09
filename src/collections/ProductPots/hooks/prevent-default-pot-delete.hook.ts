@@ -3,7 +3,7 @@ import { DEFAULT_POT_CODE } from '../constants'
 
 export const preventDefaultPotDeleteHook: CollectionBeforeDeleteHook = async ({ id, req }) => {
   const pot = await req.payload.findByID({
-    collection: 'pots',
+    collection: 'product-pots',
     id,
     depth: 0,
     req,

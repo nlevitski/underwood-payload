@@ -1,9 +1,9 @@
 import type { PayloadRequest } from 'payload'
-import { DEFAULT_POT_CODE } from '@/collections/Pots/constants'
+import { DEFAULT_POT_CODE } from '@/collections/ProductPots/constants'
 
 export async function getDefaultPotId(req: PayloadRequest): Promise<number | null> {
   const result = await req.payload.find({
-    collection: 'pots',
+    collection: 'product-pots',
     where: {
       code: {
         equals: DEFAULT_POT_CODE,

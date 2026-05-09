@@ -104,10 +104,14 @@ function buildCatalogItemLookup(): Map<string, string> {
 
   for (const category of productCatalog) {
     for (const item of category.items) {
-      const aliases = new Set<string>([item.name])
+      const aliases = new Set<string>([item.name, item.nameRu])
       const mainPart = item.name.split('(')[0]?.trim()
       if (mainPart) {
         aliases.add(mainPart)
+      }
+      const mainPartRu = item.nameRu.split('(')[0]?.trim()
+      if (mainPartRu) {
+        aliases.add(mainPartRu)
       }
 
       for (const alias of aliases) {
@@ -253,9 +257,21 @@ function resolveItemName(product: ParsedProduct, catalogLookup: Map<string, stri
   const candidates = [stripCategoryPrefix(product.name), product.name]
 
   for (const candidate of candidates) {
-    const match = catalogLookup.get(normalizeName(candidate))
-    if (match) {
-      return match
+    const words = candidate
+      .trim()
+      .split(/\s+/u)
+      .filter(Boolean)
+
+    for (let start = 0; start < words.length; start += 1) {
+      const suffix = words.slice(start).join(' ').trim()
+      if (!suffix) {
+        continue
+      }
+
+      const match = catalogLookup.get(normalizeName(suffix))
+      if (match) {
+        return match
+      }
     }
   }
 
@@ -334,7 +350,7 @@ export async function seedProductVariants(payload: Payload) {
       pagination: false,
     }),
     payload.find({
-      collection: 'pots',
+      collection: 'product-pots',
       depth: 0,
       limit: 0,
       pagination: false,

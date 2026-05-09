@@ -1,9 +1,10 @@
 import type { Payload } from 'payload'
-import { DEFAULT_POT_CODE } from '@/collections/Pots/constants'
+import { DEFAULT_POT_CODE } from '@/collections/ProductPots/constants'
 
 const resetCollectionsOrder = [
   'product-variants',
   'product-item-attributes',
+  'product-item-cares',
   'product-items',
   'product-variant-types',
   'product-ages',
@@ -11,7 +12,7 @@ const resetCollectionsOrder = [
   'product-attributes',
   'product-categories',
   'product-groups',
-  'pots',
+  'product-pots',
   'articles',
   'article-authors',
   'media',
@@ -33,7 +34,7 @@ export async function resetSeedData(payload: Payload) {
 
       for (const doc of result.docs) {
         if (
-          collection === 'pots' &&
+          collection === 'product-pots' &&
           'code' in doc &&
           typeof doc.code === 'string' &&
           doc.code === DEFAULT_POT_CODE

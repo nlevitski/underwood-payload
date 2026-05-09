@@ -20,7 +20,8 @@ import { ProductVariantTypes } from './collections/ProductVariantTypes/config'
 import { Articles } from './collections/Articles/config'
 import { env } from './lib/env'
 import { ArticleAuthors } from './collections/ArticleAuthors/config'
-import { Pots } from './collections/Pots/config'
+import { ProductPots } from './collections/ProductPots/config'
+import { ProductItemCares } from './collections/ProductItemCares/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -42,11 +43,12 @@ export default buildConfig({
     ProductGroups,
     ProductCategories,
     ProductItems,
+    ProductItemCares,
     ProductAttributes,
     ProductItemAttributes,
     ProductSizes,
     ProductAges,
-    Pots,
+    ProductPots,
     ProductVariantTypes,
     ProductVariants,
     Articles,

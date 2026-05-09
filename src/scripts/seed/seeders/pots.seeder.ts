@@ -1,5 +1,5 @@
 import type { Payload } from 'payload'
-import { DEFAULT_POT_CODE } from '@/collections/Pots/constants'
+import { DEFAULT_POT_CODE } from '@/collections/ProductPots/constants'
 
 type PotSeed = {
   code: string
@@ -112,7 +112,7 @@ const pots: PotSeed[] = [
 export async function seedPots(payload: Payload) {
   for (const pot of pots) {
     const existing = await payload.find({
-      collection: 'pots',
+      collection: 'product-pots',
       where: {
         code: {
           equals: pot.code,
@@ -126,7 +126,7 @@ export async function seedPots(payload: Payload) {
     const existingPot = existing.docs[0]
     if (existingPot && typeof existingPot.id === 'number') {
       await payload.update({
-        collection: 'pots',
+        collection: 'product-pots',
         id: existingPot.id,
         data: pot,
       })
@@ -134,7 +134,7 @@ export async function seedPots(payload: Payload) {
     }
 
     await payload.create({
-      collection: 'pots',
+      collection: 'product-pots',
       draft: false,
       data: pot,
     })

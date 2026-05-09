@@ -18,6 +18,9 @@ const valueMap = {
 export function ProductClient({ product }: { product: Product }) {
   const initialVariant = product.variants[0]
   const initialPot = initialVariant?.pots[0]
+  const hasVariantSelection = product.valueType !== 'none'
+  const variantLabel = product.valueType === 'none' ? null : valueMap[product.valueType]
+  const allPots = product.variants.flatMap((variant) => variant.pots)
 
   const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
   const [potId, setPotId] = useState<number>(initialPot?.id ?? 0)
@@ -32,7 +35,9 @@ export function ProductClient({ product }: { product: Product }) {
 
   const currentVariant =
     product.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
-  const currentPot = currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
+  const currentPot = hasVariantSelection
+    ? currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
+    : allPots.find((pot) => pot.id === displayPotId) ?? allPots[0]
 
   if (!currentVariant || !currentPot) {
     return null
@@ -95,10 +100,10 @@ export function ProductClient({ product }: { product: Product }) {
         <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
         <div onMouseLeave={clearHoverSelection}>
-          {product.valueType !== 'none' && (
+          {hasVariantSelection && (
             <div>
               <span className="text-sm font-medium text-foreground mb-2 block">
-                {valueMap[product.valueType]}
+                {variantLabel}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {product.variants.map((variant) => {
@@ -130,7 +135,7 @@ export function ProductClient({ product }: { product: Product }) {
           <div className="mt-4">
             <span className="text-sm font-medium text-foreground mb-2 block">Горшок</span>
             <div className="flex flex-wrap gap-1.5">
-              {currentVariant.pots.map((pot) => (
+              {(hasVariantSelection ? currentVariant.pots : allPots).map((pot) => (
                 <button
                   key={pot.id}
                   type="button"
@@ -141,9 +146,11 @@ export function ProductClient({ product }: { product: Product }) {
                   onMouseEnter={() => handlePotHover(pot.id)}
                   aria-label={pot.name}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    pot.id === displayPotId
-                      ? 'bg-forest text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-accent'
+                    hoveredPotId === pot.id
+                      ? 'bg-accent text-accent-foreground'
+                      : pot.id === potId
+                        ? 'bg-forest text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {pot.name}

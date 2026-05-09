@@ -9,7 +9,7 @@ type ProductAttribute = {
 }
 
 type ProductAttributeCollection = {
-  category: 'conifers' | 'berries' | 'foliage'
+  category: 'conifers' | 'berries' | 'foliage' | 'perennials'
   name: string
   attributes: ProductAttribute[]
 }

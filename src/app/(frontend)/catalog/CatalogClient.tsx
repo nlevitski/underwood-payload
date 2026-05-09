@@ -158,7 +158,6 @@ function buildSearchParamsFromState(state: CatalogState, minPrice: number, maxPr
 export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
   const router = useRouter()
   const pathname = usePathname()
-
   // Calculate dynamic filter values from products
   const { categories, potVolumes, minPrice, maxPrice } = useMemo(() => {
     const categoryKeys = new Set<string>()
@@ -330,7 +329,14 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
 
   useEffect(() => {
     const nextQuery = buildSearchParamsFromState(
-      { selectedCategories, selectedPots, priceRange: appliedPriceRange, inStockOnly, perPage, page },
+      {
+        selectedCategories,
+        selectedPots,
+        priceRange: appliedPriceRange,
+        inStockOnly,
+        perPage,
+        page,
+      },
       minPrice,
       maxPrice,
     )
