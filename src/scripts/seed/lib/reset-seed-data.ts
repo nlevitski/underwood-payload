@@ -9,7 +9,6 @@ const resetCollectionsOrder = [
   'product-variant-types',
   'product-ages',
   'product-sizes',
-  'product-attributes',
   'product-categories',
   'product-groups',
   'product-pots',

@@ -1,22 +1,28 @@
 import Link from 'next/link'
-import { products } from '../products'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { ProductClient } from './ProductClient'
 import { CareGuideSection } from './CareGuideSection'
 import { PlantCard } from '../../_components/plantCard/PlantCard'
+import { getPayloadClient } from '@/lib/payload/client'
+import { getDbProducts } from '../dbProducts'
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>
 }
 
-export function generateStaticParams() {
-  return products.map((product) => ({ slug: product.id }))
+export async function generateStaticParams() {
+  const payload = await getPayloadClient()
+  const products = await getDbProducts(payload)
+
+  return products.map((product) => ({ slug: product.slug }))
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params
-  const product = products.find((p) => p.id === slug)
+  const payload = await getPayloadClient()
+  const products = await getDbProducts(payload)
+  const product = products.find((p) => p.slug === slug)
 
   if (!product) {
     return (
@@ -33,7 +39,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   // Get similar products from the same category (max 4, excluding current product)
   const similarProducts = products
-    .filter((p) => p.categoryKey === product.categoryKey && p.id !== product.id)
+    .filter((p) => p.categoryKey === product.categoryKey && p.slug !== product.slug)
     .slice(0, 4)
 
   return (
@@ -77,7 +83,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {similarProducts.map((similarProduct) => (
-                <PlantCard key={similarProduct.id} {...similarProduct} />
+                <PlantCard key={similarProduct.slug} {...similarProduct} />
               ))}
             </div>
           </div>

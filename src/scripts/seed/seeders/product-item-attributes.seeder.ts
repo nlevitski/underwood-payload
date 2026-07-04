@@ -1,5 +1,19 @@
 import type { Payload } from 'payload'
-import { productCatalog } from './product-catalog.data'
+import { productCatalog, type CatalogItemAttributes } from './product-catalog.data'
+
+type ProductItemAttributeData = {
+  item: number
+  type?: string
+  notes?: string
+  description?: string
+  ripeningTime?: 'early' | 'earlyMid' | 'midSeason' | 'midLate' | 'late'
+  growthForm?: string
+  color?: string
+}
+
+function isFilledValue(value: unknown): value is string | number | boolean {
+  return value !== '' && value !== '—' && value !== null && value !== undefined
+}
 
 function toTextValue(value: string | number | boolean): string {
   if (typeof value === 'string') {
@@ -13,8 +27,74 @@ function toTextValue(value: string | number | boolean): string {
   return value ? 'true' : 'false'
 }
 
+function toRipeningTime(value: string | number | boolean): ProductItemAttributeData['ripeningTime'] {
+  const textValue = toTextValue(value).toLowerCase()
+
+  if (textValue.includes('ранний') && textValue.includes('средний')) {
+    return 'earlyMid'
+  }
+
+  if (
+    (textValue.includes('средний') || textValue.includes('средне')) &&
+    textValue.includes('поздний')
+  ) {
+    return 'midLate'
+  }
+
+  if (textValue.includes('ранний')) {
+    return 'early'
+  }
+
+  if (textValue.includes('средний') || textValue.includes('средне')) {
+    return 'midSeason'
+  }
+
+  if (textValue.includes('поздний')) {
+    return 'late'
+  }
+
+  return undefined
+}
+
+function buildItemAttributeData(
+  itemId: number,
+  attributes: CatalogItemAttributes,
+): ProductItemAttributeData {
+  const data: ProductItemAttributeData = {
+    item: itemId,
+  }
+
+  if (isFilledValue(attributes.type)) {
+    data.type = toTextValue(attributes.type)
+  }
+
+  if (isFilledValue(attributes.description)) {
+    data.description = toTextValue(attributes.description)
+  }
+
+  if (isFilledValue(attributes.notes)) {
+    data.notes = toTextValue(attributes.notes)
+  } else if (isFilledValue(attributes.features)) {
+    data.notes = toTextValue(attributes.features)
+  }
+
+  if (isFilledValue(attributes.ripeningTime)) {
+    data.ripeningTime = toRipeningTime(attributes.ripeningTime)
+  }
+
+  if (isFilledValue(attributes.growthForm)) {
+    data.growthForm = toTextValue(attributes.growthForm)
+  }
+
+  if (isFilledValue(attributes.color)) {
+    data.color = toTextValue(attributes.color)
+  }
+
+  return data
+}
+
 export async function seedProductItemAttributes(payload: Payload) {
-  const [{ docs: groups }, { docs: categories }, { docs: items }, { docs: attributes }] = await Promise.all([
+  const [{ docs: groups }, { docs: categories }, { docs: items }] = await Promise.all([
     payload.find({
       collection: 'product-groups',
       depth: 0,
@@ -29,12 +109,6 @@ export async function seedProductItemAttributes(payload: Payload) {
     }),
     payload.find({
       collection: 'product-items',
-      depth: 0,
-      limit: 0,
-      pagination: false,
-    }),
-    payload.find({
-      collection: 'product-attributes',
       depth: 0,
       limit: 0,
       pagination: false,
@@ -60,7 +134,13 @@ export async function seedProductItemAttributes(payload: Payload) {
       continue
     }
 
-    categoryIdByKey.set(`${groupName}::${category.name}`, category.id)
+    if (typeof category.nameRu === 'string') {
+      categoryIdByKey.set(`${groupName}::${category.nameRu}`, category.id)
+    }
+
+    if (typeof category.name === 'string') {
+      categoryIdByKey.set(`${groupName}::${category.name}`, category.id)
+    }
   }
 
   const itemIdByKey = new Map<string, number>()
@@ -77,22 +157,12 @@ export async function seedProductItemAttributes(payload: Payload) {
     itemIdByKey.set(`${categoryId}::${item.name}`, item.id)
   }
 
-  const attributeByKey = new Map<string, { id: number; label: string }>()
-  for (const attribute of attributes) {
-    if (typeof attribute.id !== 'number') {
-      continue
-    }
-
-    const categoryId = typeof attribute.category === 'number' ? attribute.category : null
-    if (!categoryId) {
-      continue
-    }
-
-    attributeByKey.set(`${categoryId}::${attribute.key}`, { id: attribute.id, label: attribute.label })
-  }
+  const createOperations: Promise<unknown>[] = []
 
   for (const catalogCategory of productCatalog) {
-    const categoryId = categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.category}`)
+    const categoryId =
+      categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.category}`) ??
+      categoryIdByKey.get(`${catalogCategory.group}::${catalogCategory.categorySlug}`)
     if (!categoryId) {
       continue
     }
@@ -103,26 +173,14 @@ export async function seedProductItemAttributes(payload: Payload) {
         continue
       }
 
-      for (const [attributeKey, rawValue] of Object.entries(item.attributes)) {
-        if (rawValue === '' || rawValue === '—') {
-          continue
-        }
-
-        const attribute = attributeByKey.get(`${categoryId}::${attributeKey}`)
-        if (!attribute) {
-          continue
-        }
-
-        await payload.create({
+      createOperations.push(
+        payload.create({
           collection: 'product-item-attributes',
-          data: {
-            item: itemId,
-            attribute: attribute.id,
-            value: toTextValue(rawValue),
-            label: toTextValue(rawValue),
-          },
-        })
-      }
+          data: buildItemAttributeData(itemId, item.attributes),
+        }),
+      )
     }
   }
+
+  await Promise.all(createOperations)
 }

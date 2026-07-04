@@ -6,16 +6,19 @@ import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import type { Product, ProductVariant } from '../products'
+import type { DBProduct } from '../dbProducts'
 
-type VariantWithValue = Extract<ProductVariant, { value: string }>
+type VariantWithValue = {
+  value: string
+  postfix: string
+}
 
 const valueMap = {
   size: 'Размер',
   age: 'Возраст',
 }
 
-export function ProductClient({ product }: { product: Product }) {
+export function ProductClient({ product }: { product: DBProduct }) {
   const initialVariant = product.variants[0]
   const initialPot = initialVariant?.pots[0]
   const hasVariantSelection = product.valueType !== 'none'
@@ -36,8 +39,8 @@ export function ProductClient({ product }: { product: Product }) {
   const currentVariant =
     product.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
   const currentPot = hasVariantSelection
-    ? currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
-    : allPots.find((pot) => pot.id === displayPotId) ?? allPots[0]
+    ? (currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0])
+    : (allPots.find((pot) => pot.id === displayPotId) ?? allPots[0])
 
   if (!currentVariant || !currentPot) {
     return null
@@ -79,7 +82,14 @@ export function ProductClient({ product }: { product: Product }) {
         transition={{ duration: 0.5 }}
       >
         <div className="aspect-square rounded-2xl overflow-hidden shadow-elevated relative">
-          <Image src={product.image} alt={product.name} fill className="object-cover" priority />
+          <Image
+            src={currentPot.images?.[0]?.url || product.image}
+            alt={product.name}
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+            priority
+          />
         </div>
       </motion.div>
 
@@ -102,9 +112,7 @@ export function ProductClient({ product }: { product: Product }) {
         <div onMouseLeave={clearHoverSelection}>
           {hasVariantSelection && (
             <div>
-              <span className="text-sm font-medium text-foreground mb-2 block">
-                {variantLabel}
-              </span>
+              <span className="text-sm font-medium text-foreground mb-2 block">{variantLabel}</span>
               <div className="flex flex-wrap gap-1.5">
                 {product.variants.map((variant) => {
                   const variantWithValue = variant as VariantWithValue

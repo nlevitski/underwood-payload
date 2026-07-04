@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/select'
 
 import { PlantCard } from '../_components/plantCard/PlantCard'
-import { products, categories as categoriesMap } from './products'
+import type { DBProduct } from './dbProducts'
 
 const perPageOptions = [12, 24, 48] as const
 
@@ -34,6 +34,7 @@ type CatalogSearchParams = Record<string, string | string[] | undefined>
 
 type CatalogClientProps = {
   initialSearchParams: CatalogSearchParams
+  products: DBProduct[]
 }
 
 type CatalogState = {
@@ -155,18 +156,20 @@ function buildSearchParamsFromState(state: CatalogState, minPrice: number, maxPr
   return params.toString()
 }
 
-export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
+export function CatalogClient({ initialSearchParams, products }: CatalogClientProps) {
   const router = useRouter()
   const pathname = usePathname()
   // Calculate dynamic filter values from products
   const { categories, potVolumes, minPrice, maxPrice } = useMemo(() => {
     const categoryKeys = new Set<string>()
+    const categoryLabels = new Map<string, string>()
     const pots = new Set<string>()
     let min = Infinity
     let max = -Infinity
 
     products.forEach((product) => {
       categoryKeys.add(product.categoryKey)
+      categoryLabels.set(product.categoryKey, product.category)
       product.variants.forEach((variant) => {
         variant.pots.forEach((pot) => {
           pots.add(normalizePotCode(pot.name))
@@ -179,7 +182,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
     return {
       categories: Array.from(categoryKeys).map((key) => ({
         key,
-        label: categoriesMap[key as keyof typeof categoriesMap],
+        label: categoryLabels.get(key) ?? key,
       })),
       potVolumes: Array.from(pots).sort((left, right) => {
         const leftValue = Number(left.replace(/[^\d]/g, ''))
@@ -194,7 +197,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
       minPrice: Number.isFinite(min) ? Math.floor(min) : 0,
       maxPrice: Number.isFinite(max) ? Math.ceil(max) : 0,
     }
-  }, [])
+  }, [products])
 
   const initialState = useMemo(
     () =>
@@ -275,7 +278,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
     })
   }, [selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
 
-  const getInitialSelection = (product: (typeof products)[number]) => {
+  const getInitialSelection = (product: DBProduct) => {
     const matchingPotCode = selectedPots.find((selectedPot) =>
       product.variants.some((variant) =>
         variant.pots.some((pot) => normalizePotCode(pot.name) === selectedPot),
@@ -300,7 +303,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
     }
   }
 
-  const getDisplayProduct = (product: (typeof products)[number]) => {
+  const getDisplayProduct = (product: DBProduct): DBProduct => {
     if (selectedPots.length === 0) {
       return product
     }
@@ -595,7 +598,7 @@ export function CatalogClient({ initialSearchParams }: CatalogClientProps) {
 
                       return (
                         <PlantCard
-                          key={`${product.id}-${selectedPots.join(',')}`}
+                          key={`${product.slug}-${selectedPots.join(',')}`}
                           {...displayProduct}
                           {...getInitialSelection(displayProduct)}
                         />

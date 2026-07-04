@@ -5,7 +5,7 @@ export const ProductGroups: CollectionConfig = {
   slug: 'product-groups',
   admin: {
     useAsTitle: 'name',
-    defaultColumns: ['name', 'slug'],
+    defaultColumns: ['nameRu', 'name', 'slug'],
   },
   fields: [
     {
@@ -16,7 +16,7 @@ export const ProductGroups: CollectionConfig = {
     },
     {
       name: 'nameRu',
-      label: 'Название',
+      label: 'Name Ru',
       type: 'text',
       required: true,
     },

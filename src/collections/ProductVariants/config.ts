@@ -133,6 +133,17 @@ export const ProductVariants: CollectionConfig = {
         readOnly: true,
       },
     },
+    {
+      name: 'Image',
+      type: 'upload',
+      relationTo: 'media',
+      filterOptions: {
+        mimeType: { 
+          contains: 'image' 
+        },
+      },
+
+    }
   ],
   hooks: {
     beforeValidate: [syncCategoryHook, syncVariantSelectionHook, generateSkuHook],

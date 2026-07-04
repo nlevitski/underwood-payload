@@ -3,8 +3,8 @@ import type { CollectionConfig } from 'payload'
 export const ProductCategories: CollectionConfig = {
   slug: 'product-categories',
   admin: {
-    useAsTitle: 'name',
-    defaultColumns: ['name', 'nameRu', 'slug', 'group'],
+    useAsTitle: 'nameRu',
+    defaultColumns: ['nameRu', 'name', 'slug', 'group'],
   },
   fields: [
     {

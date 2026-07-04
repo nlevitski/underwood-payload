@@ -73,7 +73,6 @@ export interface Config {
     'product-categories': ProductCategory;
     'product-items': ProductItem;
     'product-item-cares': ProductItemCare;
-    'product-attributes': ProductAttribute;
     'product-item-attributes': ProductItemAttribute;
     'product-sizes': ProductSize;
     'product-ages': ProductAge;
@@ -98,7 +97,6 @@ export interface Config {
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     'product-items': ProductItemsSelect<false> | ProductItemsSelect<true>;
     'product-item-cares': ProductItemCaresSelect<false> | ProductItemCaresSelect<true>;
-    'product-attributes': ProductAttributesSelect<false> | ProductAttributesSelect<true>;
     'product-item-attributes': ProductItemAttributesSelect<false> | ProductItemAttributesSelect<true>;
     'product-sizes': ProductSizesSelect<false> | ProductSizesSelect<true>;
     'product-ages': ProductAgesSelect<false> | ProductAgesSelect<true>;
@@ -122,6 +120,9 @@ export interface Config {
   globals: {};
   globalsSelect: {};
   locale: null;
+  widgets: {
+    collections: CollectionsWidget;
+  };
   user: User;
   jobs: {
     tasks: unknown;
@@ -178,7 +179,6 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
-  blurDataUrl: string;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -190,6 +190,56 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    xs?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    s?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    m?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    l?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    xl?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+    xxl?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -226,47 +276,8 @@ export interface ProductItem {
   name: string;
   nameRu: string;
   slug: string;
-  /**
-   * Edit item attributes inline. Values are stored in Product Item Attributes collection.
-   */
-  itemAttributes?:
-    | {
-        attribute: number | ProductAttribute;
-        value: string;
-        /**
-         * Optional. If empty, it will be set to Value on save.
-         */
-        label?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-attributes".
- */
-export interface ProductAttribute {
-  id: number;
-  category: number | ProductCategory;
-  label: string;
-  key: string;
-  dataType: 'text' | 'number' | 'boolean';
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-item-cares".
- */
-export interface ProductItemCare {
-  id: number;
-  item: number | ProductItem;
-  watering?: string | null;
-  light?: string | null;
-  temperature?: string | null;
-  size?: string | null;
+  attributes?: (number | null) | ProductItemAttribute;
+  cares?: (number | null) | ProductItemCare;
   updatedAt: string;
   createdAt: string;
 }
@@ -276,10 +287,29 @@ export interface ProductItemCare {
  */
 export interface ProductItemAttribute {
   id: number;
+  displayName?: string | null;
   item: number | ProductItem;
-  attribute: number | ProductAttribute;
-  label: string;
-  value: string;
+  type?: string | null;
+  notes?: string | null;
+  description?: string | null;
+  ripeningTime?: ('early' | 'earlyMid' | 'midSeason' | 'midLate' | 'late') | null;
+  growthForm?: string | null;
+  color?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-item-cares".
+ */
+export interface ProductItemCare {
+  id: number;
+  displayName?: string | null;
+  item: number | ProductItem;
+  watering?: string | null;
+  light?: string | null;
+  temperature?: string | null;
+  size?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -349,6 +379,7 @@ export interface ProductVariant {
   price: number;
   stockQty: number;
   isAvailable: boolean;
+  Image?: (number | null) | Media;
   updatedAt: string;
   createdAt: string;
 }
@@ -662,10 +693,6 @@ export interface PayloadLockedDocument {
         value: number | ProductItemCare;
       } | null)
     | ({
-        relationTo: 'product-attributes';
-        value: number | ProductAttribute;
-      } | null)
-    | ({
         relationTo: 'product-item-attributes';
         value: number | ProductItemAttribute;
       } | null)
@@ -779,7 +806,6 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
-  blurDataUrl?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -791,6 +817,70 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        xs?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        s?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        m?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        l?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xl?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+        xxl?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -824,14 +914,8 @@ export interface ProductItemsSelect<T extends boolean = true> {
   name?: T;
   nameRu?: T;
   slug?: T;
-  itemAttributes?:
-    | T
-    | {
-        attribute?: T;
-        value?: T;
-        label?: T;
-        id?: T;
-      };
+  attributes?: T;
+  cares?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -840,6 +924,7 @@ export interface ProductItemsSelect<T extends boolean = true> {
  * via the `definition` "product-item-cares_select".
  */
 export interface ProductItemCaresSelect<T extends boolean = true> {
+  displayName?: T;
   item?: T;
   watering?: T;
   light?: T;
@@ -850,25 +935,17 @@ export interface ProductItemCaresSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "product-attributes_select".
- */
-export interface ProductAttributesSelect<T extends boolean = true> {
-  category?: T;
-  label?: T;
-  key?: T;
-  dataType?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "product-item-attributes_select".
  */
 export interface ProductItemAttributesSelect<T extends boolean = true> {
+  displayName?: T;
   item?: T;
-  attribute?: T;
-  label?: T;
-  value?: T;
+  type?: T;
+  notes?: T;
+  description?: T;
+  ripeningTime?: T;
+  growthForm?: T;
+  color?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -930,6 +1007,7 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   price?: T;
   stockQty?: T;
   isAvailable?: T;
+  Image?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1175,6 +1253,16 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "collections_widget".
+ */
+export interface CollectionsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -10,7 +10,6 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media/config'
 import { ProductGroups } from './collections/ProductGroups/config'
 import { ProductCategories } from './collections/ProductCategories/config'
-import { ProductAttributes } from './collections/ProductAttributes/config'
 import { ProductItems } from './collections/ProductItems/config'
 import { ProductVariants } from './collections/ProductVariants/config'
 import { ProductItemAttributes } from './collections/ProductItemAttributes/config'
@@ -44,7 +43,6 @@ export default buildConfig({
     ProductCategories,
     ProductItems,
     ProductItemCares,
-    ProductAttributes,
     ProductItemAttributes,
     ProductSizes,
     ProductAges,

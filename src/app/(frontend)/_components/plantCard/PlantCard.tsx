@@ -2,20 +2,21 @@
 
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import { StaticImageData } from 'next/image'
 import { useState } from 'react'
 import Link from 'next/link'
-import type { Product, ProductVariant } from '../../catalog/products'
+import type { DBProduct } from '../../catalog/dbProducts'
 
 const valueMap = {
   size: 'Размер',
   age: 'Возраст',
 } as const
 
-type VariantWithValue = Extract<ProductVariant, { value: string }>
+type VariantWithValue = {
+  value: string
+  postfix: string
+}
 
-type PlantCardProps = Product & {
-  image: StaticImageData
+type PlantCardProps = DBProduct & {
   initialVariantId?: number
   initialPotId?: number
 }
@@ -45,10 +46,11 @@ export function PlantCard(props: PlantCardProps) {
   const displayPotId = hoveredPotId ?? potId
   const displayVariantId = hoveredVariantId ?? variantId
 
-  const currentVariant = props.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
+  const currentVariant =
+    props.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
   const currentPot = hasVariantSelection
-    ? currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0]
-    : allPots.find((pot) => pot.id === displayPotId) ?? allPots[0]
+    ? (currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0])
+    : (allPots.find((pot) => pot.id === displayPotId) ?? allPots[0])
 
   if (!currentVariant || !currentPot) {
     return null
@@ -86,9 +88,10 @@ export function PlantCard(props: PlantCardProps) {
     <div className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card">
       <div className="aspect-square overflow-hidden relative">
         <Image
-          src={props.image}
+          src={currentPot.images?.[0]?.url || props.image}
           alt={props.name}
           fill
+          sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </div>
@@ -103,9 +106,7 @@ export function PlantCard(props: PlantCardProps) {
         <div onMouseLeave={clearHoverSelection}>
           {hasVariantSelection && (
             <div>
-              <p className="text-xs text-muted-foreground mb-1.5 block">
-                {variantLabel}
-              </p>
+              <p className="text-xs text-muted-foreground mb-1.5 block">{variantLabel}</p>
               <div className="flex flex-wrap gap-1.5">
                 {props.variants.map((variant) => {
                   const variantWithValue = variant as VariantWithValue
@@ -165,13 +166,15 @@ export function PlantCard(props: PlantCardProps) {
           <span className="text-base font-bold text-foreground">{currentPot.price} BYN</span>
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-              currentPot.inStock ? 'bg-accent text-accent-foreground' : 'bg-muted text-muted-foreground'
+              currentPot.inStock
+                ? 'bg-accent text-accent-foreground'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
             {currentPot.inStock ? 'В наличии' : 'Под заказ'}
           </span>
         </div>
-        <Link href={`/catalog/${props.id}`}>
+        <Link href={`/catalog/${props.slug}`}>
           <div className="flex items-center gap-1 text-sm text-forest font-medium pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <span>Подробнее</span>
             <ArrowRight className="h-4 w-4" />

@@ -1,18 +1,28 @@
 import type { CollectionConfig } from 'payload'
+import { hydrateItemCareDisplayNameHook, populateItemCareDisplayNameHook } from './hooks/populate-display-name.hook'
+import { clearItemCareLinkHook, syncItemCareLinkHook } from './hooks/sync-item-link.hook'
 
 export const ProductItemCares: CollectionConfig = {
   slug: 'product-item-cares',
   admin: {
-    useAsTitle: 'item',
-    defaultColumns: ['item', 'watering', 'light', 'temperature', 'size'],
+    useAsTitle: 'displayName',
+    defaultColumns: ['displayName', 'item', 'watering', 'light', 'temperature', 'size'],
   },
   fields: [
+    {
+      name: 'displayName',
+      type: 'text',
+      admin: {
+        readOnly: true,
+      },
+    },
     {
       name: 'item',
       type: 'relationship',
       relationTo: 'product-items',
       required: true,
       index: true,
+      unique: true,
     },
     {
       name: 'watering',
@@ -31,4 +41,10 @@ export const ProductItemCares: CollectionConfig = {
       type: 'text',
     },
   ],
+  hooks: {
+    beforeValidate: [populateItemCareDisplayNameHook],
+    afterRead: [hydrateItemCareDisplayNameHook],
+    afterChange: [syncItemCareLinkHook],
+    beforeDelete: [clearItemCareLinkHook],
+  },
 }

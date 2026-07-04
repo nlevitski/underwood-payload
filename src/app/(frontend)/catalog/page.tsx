@@ -1,4 +1,6 @@
+import { getPayloadClient } from '@/lib/payload/client'
 import { CatalogClient } from './CatalogClient'
+import { getDbProducts } from './dbProducts'
 
 type CatalogSearchParams = Record<string, string | string[] | undefined>
 
@@ -30,7 +32,16 @@ export default async function CatalogPage({
   searchParams: Promise<CatalogSearchParams>
 }) {
   const resolvedSearchParams = await searchParams
+  const payload = await getPayloadClient()
+  const dbProducts = await getDbProducts(payload)
+
   const queryKey = serializeSearchParams(resolvedSearchParams) || 'catalog'
 
-  return <CatalogClient key={queryKey} initialSearchParams={resolvedSearchParams} />
+  return (
+    <CatalogClient
+      key={queryKey}
+      initialSearchParams={resolvedSearchParams}
+      products={dbProducts}
+    />
+  )
 }

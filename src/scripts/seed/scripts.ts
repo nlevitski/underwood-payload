@@ -7,7 +7,6 @@ import { resetSeedData } from './lib/reset-seed-data'
 import { seedProductGroups } from './seeders/product-groups.seeder'
 import { seedProductCategories } from './seeders/product-categories.seeder'
 import { seedPots } from './seeders/pots.seeder'
-import { seedProductAttributes } from './seeders/product-attributes.seeder'
 import { seedProductAges } from './seeders/product-ages.seeder'
 import { seedProductSizes } from './seeders/product-sizes.seeder'
 import { seedProductItems } from './seeders/product-items.seeder'
@@ -37,7 +36,6 @@ async function main() {
     await seedArticles(payload, author.id)
     await seedProductGroups(payload)
     await seedProductCategories(payload)
-    await seedProductAttributes(payload)
     await Promise.all([
       seedProductAges(payload),
       seedProductSizes(payload),
@@ -45,8 +43,7 @@ async function main() {
       seedPots(payload),
     ])
     await seedProductItems(payload)
-    await seedProductItemCares(payload)
-    await seedProductItemAttributes(payload)
+    await Promise.all([seedProductItemCares(payload), seedProductItemAttributes(payload)])
     await seedProductVariants(payload)
     process.exit(0)
   } catch (error) {
