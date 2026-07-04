@@ -25,11 +25,13 @@ ENV DATABASE_URL=${DATABASE_URL}
 ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
 ENV CMS_SEED_ADMIN_EMAIL=${CMS_SEED_ADMIN_EMAIL}
 ENV CMS_SEED_ADMIN_PASSWORD=${CMS_SEED_ADMIN_PASSWORD}
+ENV NEXT_OUTPUT_STANDALONE=true
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN pnpm build
+RUN mkdir -p /app/.sharp-libvips && cp -a /app/node_modules/.pnpm/@img+sharp-libvips-* /app/.sharp-libvips/
 
 FROM base AS runner
 WORKDIR /app
@@ -41,7 +43,10 @@ ENV HOSTNAME=0.0.0.0
 RUN mkdir -p /app/.next /app/media /app/data && chown -R node:node /app
 
 COPY --from=builder --chown=node:node /app/public ./public
+COPY --from=builder --chown=node:node /app/data ./data
+COPY --from=builder --chown=node:node /app/media ./media
 COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.sharp-libvips/ ./node_modules/.pnpm/
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
 USER node
