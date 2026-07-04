@@ -43,8 +43,6 @@ ENV HOSTNAME=0.0.0.0
 RUN mkdir -p /app/.next /app/media /app/data && chown -R node:node /app
 
 COPY --from=builder --chown=node:node /app/public ./public
-COPY --from=builder --chown=node:node /app/data ./data
-COPY --from=builder --chown=node:node /app/media ./media
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.sharp-libvips/ ./node_modules/.pnpm/
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static

@@ -20,9 +20,5 @@ services:
     ports:
       - '${PORT:-3005}:${PORT:-3005}'
     volumes:
-      - payload-data:/app/data
-      - payload-media:/app/media
-
-volumes:
-  payload-data:
-  payload-media:
+      - ./data:/app/data
+      - ./media:/app/media

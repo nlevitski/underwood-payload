@@ -18,8 +18,8 @@ services:
       PORT: ${PORT:-3005}
       HOSTNAME: 0.0.0.0
     volumes:
-      - payload-data:/app/data
-      - payload-media:/app/media
+      - ./data:/app/data
+      - ./media:/app/media
     labels:
       traefik.enable: 'true'
       traefik.docker.network: lignin
@@ -34,10 +34,6 @@ services:
       traefik.http.middlewares.underwood-https-redirect.redirectscheme.scheme: https
     networks:
       - lignin
-
-volumes:
-  payload-data:
-  payload-media:
 
 networks:
   lignin:

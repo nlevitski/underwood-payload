@@ -25,8 +25,8 @@ jobs:
       - name: Trust VPS host
         run: ssh-keyscan -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
 
-      - name: Create deploy directory
-        run: ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "mkdir -p '${DEPLOY_PATH}'"
+      - name: Create deploy directories
+        run: ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "mkdir -p '${DEPLOY_PATH}/data' '${DEPLOY_PATH}/media'"
 
       - name: Sync project files
         run: |
@@ -36,11 +36,32 @@ jobs:
             --exclude 'node_modules' \
             --exclude '.next' \
             --exclude '.env' \
+            --exclude 'data' \
+            --exclude 'media' \
             --exclude 'coverage' \
             --exclude 'playwright-report' \
             --exclude 'test-results' \
             -e ssh \
             ./ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${DEPLOY_PATH}/"
+
+      - name: Verify Payload data on VPS
+        run: |
+          ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "
+            set -e
+            test -f '${DEPLOY_PATH}/data/underwood-payload.db' || {
+              echo 'Missing ${DEPLOY_PATH}/data/underwood-payload.db'
+              exit 1
+            }
+            test -d '${DEPLOY_PATH}/media' || {
+              echo 'Missing ${DEPLOY_PATH}/media'
+              exit 1
+            }
+            media_count=\$(find '${DEPLOY_PATH}/media' -maxdepth 1 -type f | wc -l)
+            test \"\$media_count\" -gt 0 || {
+              echo 'No media files found in ${DEPLOY_PATH}/media'
+              exit 1
+            }
+          "
 
       - name: Deploy on VPS
         run: ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "cd '${DEPLOY_PATH}' && docker compose -f docker-compose.prod.yml up -d --build --remove-orphans"
