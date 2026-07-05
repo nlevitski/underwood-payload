@@ -3,67 +3,21 @@ import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
 
-import thujaImage from '@/assets/plant-thuja.jpg'
-import blueberryImage from '@/assets/plant-blueberry.jpg'
-import raspberryImage from '@/assets/plant-raspberry.jpg'
-import { PopularCard } from '../popularCard/PopularCard'
+import { getPayloadClient } from '@/lib/payload/client'
 
-type PopularPlant = {
-  id: string
-  name: string
-  category: string
-  image: string
-  price: number
-  pot: string
-  age?: string
-  size?: string
-  inStock: boolean
-}
+import { getDbProducts } from '../../catalog/dbProducts'
+import { PlantCard } from '../plantCard/PlantCard'
 
-const popularPlants: PopularPlant[] = [
-  {
-    id: 'thuja-smaragd',
-    name: 'Туя Смарагд',
-    category: 'Хвойные',
-    image: thujaImage.src,
-    price: 10,
-    pot: 'C2',
-    size: '50-60 см',
-    inStock: true,
-  },
-  {
-    id: 'thuja-brabant',
-    name: 'Туя Брабант',
-    category: 'Хвойные',
-    image: thujaImage.src,
-    price: 10,
-    pot: 'C2',
-    size: '50-60 см',
-    inStock: true,
-  },
-  {
-    id: 'blueberry-bluecrop',
-    name: 'Голубика Блюкроп',
-    category: 'Ягодные',
-    image: blueberryImage.src,
-    price: 12,
-    pot: 'C2',
-    age: '3 года',
-    inStock: true,
-  },
-  {
-    id: 'raspberry-rubyfall',
-    name: 'Малина Пумилио',
-    category: 'Ягодные',
-    image: raspberryImage.src,
-    price: 10,
-    pot: 'C2',
-    age: '1 год',
-    inStock: true,
-  },
-]
+const popularPlantsLimit = 4
 
-export function PopularPlants() {
+export async function PopularPlants() {
+  const payload = await getPayloadClient()
+  const popularPlants = (await getDbProducts(payload)).slice(0, popularPlantsLimit)
+
+  if (popularPlants.length === 0) {
+    return null
+  }
+
   return (
     <section className="py-20">
       <div className="container">
@@ -90,7 +44,7 @@ export function PopularPlants() {
         </motion.div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {popularPlants.map((plant) => (
-            <PopularCard key={plant.id} {...plant} />
+            <PlantCard key={plant.slug} {...plant} />
           ))}
         </div>
       </div>

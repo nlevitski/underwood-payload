@@ -3,7 +3,7 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
-import nurseryRowsImage from '@/assets/nursery-rows.jpg'
+import nurseryRowsImage from '@/assets/hero-nursery-thuja-angle-native-q85.webp'
 export function About() {
   return (
     <section className="py-20">

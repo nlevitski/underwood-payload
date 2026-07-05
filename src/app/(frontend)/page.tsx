@@ -7,6 +7,8 @@ import { Hero } from './_components/hero/Hero'
 import { NurseryPhotos } from './_components/nurseryPhotos/NurseryPhotos'
 import { PopularPlants } from './_components/popularPlants/PopularPlants'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   return (
     <>

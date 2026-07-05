@@ -85,7 +85,12 @@ export function PlantCard(props: PlantCardProps) {
   }
 
   return (
-    <div className="group flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card">
+    <div className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card">
+      <Link
+        href={`/catalog/${props.slug}`}
+        aria-label={`Открыть страницу товара ${props.name}`}
+        className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
+      />
       <div className="aspect-square overflow-hidden relative">
         <Image
           src={currentPot.images?.[0]?.url || props.image}
@@ -103,7 +108,7 @@ export function PlantCard(props: PlantCardProps) {
           {props.name}
         </h3>
 
-        <div onMouseLeave={clearHoverSelection}>
+        <div className="relative z-20" onMouseLeave={clearHoverSelection}>
           {hasVariantSelection && (
             <div>
               <p className="text-xs text-muted-foreground mb-1.5 block">{variantLabel}</p>
@@ -174,12 +179,10 @@ export function PlantCard(props: PlantCardProps) {
             {currentPot.inStock ? 'В наличии' : 'Под заказ'}
           </span>
         </div>
-        <Link href={`/catalog/${props.slug}`}>
-          <div className="flex items-center gap-1 text-sm text-forest font-medium pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <span>Подробнее</span>
-            <ArrowRight className="h-4 w-4" />
-          </div>
-        </Link>
+        <div className="flex items-center gap-1 text-sm text-forest font-medium pt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <span>Подробнее</span>
+          <ArrowRight className="h-4 w-4" />
+        </div>
       </div>
     </div>
   )

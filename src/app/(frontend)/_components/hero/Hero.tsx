@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
 import { cn } from '@/lib/utils'
 
-import heroImage from '@/assets/hero-nursery.jpg'
+import heroImage from '@/assets/hero-nursery-thuja-main-native-q85.webp'
 
 type HeroProps = {
   title?: ReactNode

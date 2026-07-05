@@ -1,4 +1,5 @@
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
 import path from 'path'
@@ -26,6 +27,19 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 export default buildConfig({
+  email: nodemailerAdapter({
+    defaultFromAddress: env.SMTP_FROM_EMAIL,
+    defaultFromName: 'Underwood',
+    transportOptions: {
+      host: env.SMTP_HOST,
+      port: env.SMTP_EMAIL_PORT,
+      secure: env.SMTP_EMAIL_PORT === 465,
+      auth: {
+        user: env.SMTP_USER,
+        pass: env.SMTP_API_KEY,
+      },
+    },
+  }),
   admin: {
     user: Users.slug,
     importMap: {
@@ -85,7 +99,7 @@ export default buildConfig({
         date: false,
         payment: false,
       },
-      defaultToEmail: 'info@underwood.by',
+      defaultToEmail: env.SMTP_TARGET_EMAIL,
     }),
   ],
 })

@@ -46,6 +46,12 @@ type CatalogState = {
   page: number
 }
 
+type LowestPricedSelection = {
+  variantId: number
+  potId: number
+  price: number
+}
+
 function normalizePotCode(value: string) {
   return value.trim().toUpperCase()
 }
@@ -154,6 +160,46 @@ function buildSearchParamsFromState(state: CatalogState, minPrice: number, maxPr
   }
 
   return params.toString()
+}
+
+function findLowestPricedSelection(
+  product: DBProduct,
+  options: {
+    selectedPots: string[]
+    priceRange: [number, number]
+    inStockOnly: boolean
+  },
+): LowestPricedSelection | null {
+  const selectedPotCodes = new Set(options.selectedPots.map(normalizePotCode))
+  let lowestSelection: LowestPricedSelection | null = null
+
+  product.variants.forEach((variant) => {
+    variant.pots.forEach((pot) => {
+      const potCode = normalizePotCode(pot.name)
+
+      if (selectedPotCodes.size > 0 && !selectedPotCodes.has(potCode)) {
+        return
+      }
+
+      if (pot.price < options.priceRange[0] || pot.price > options.priceRange[1]) {
+        return
+      }
+
+      if (options.inStockOnly && !pot.inStock) {
+        return
+      }
+
+      if (!lowestSelection || pot.price < lowestSelection.price) {
+        lowestSelection = {
+          variantId: variant.id,
+          potId: pot.id,
+          price: pot.price,
+        }
+      }
+    })
+  })
+
+  return lowestSelection
 }
 
 export function CatalogClient({ initialSearchParams, products }: CatalogClientProps) {
@@ -278,24 +324,39 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
     })
   }, [selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
 
+  const sortedProducts = useMemo(() => {
+    return [...filteredProducts].sort((left, right) => {
+      const leftSelection = findLowestPricedSelection(left, {
+        selectedPots,
+        priceRange: appliedPriceRange,
+        inStockOnly,
+      })
+      const rightSelection = findLowestPricedSelection(right, {
+        selectedPots,
+        priceRange: appliedPriceRange,
+        inStockOnly,
+      })
+
+      const leftPrice = leftSelection?.price ?? Number.POSITIVE_INFINITY
+      const rightPrice = rightSelection?.price ?? Number.POSITIVE_INFINITY
+
+      return leftPrice - rightPrice || left.name.localeCompare(right.name, 'ru')
+    })
+  }, [appliedPriceRange, filteredProducts, inStockOnly, selectedPots])
+
   const getInitialSelection = (product: DBProduct) => {
-    const matchingPotCode = selectedPots.find((selectedPot) =>
-      product.variants.some((variant) =>
-        variant.pots.some((pot) => normalizePotCode(pot.name) === selectedPot),
-      ),
-    )
+    const lowestSelection = findLowestPricedSelection(product, {
+      selectedPots,
+      priceRange: appliedPriceRange,
+      inStockOnly,
+    })
 
     const initialVariant =
-      (matchingPotCode
-        ? product.variants.find((variant) =>
-            variant.pots.some((pot) => normalizePotCode(pot.name) === matchingPotCode),
-          )
-        : undefined) ?? product.variants[0]
-
+      product.variants.find((variant) => variant.id === lowestSelection?.variantId) ??
+      product.variants[0]
     const initialPot =
-      initialVariant?.pots.find((pot) =>
-        matchingPotCode ? normalizePotCode(pot.name) === matchingPotCode : true,
-      ) ?? initialVariant?.pots[0]
+      initialVariant?.pots.find((pot) => pot.id === lowestSelection?.potId) ??
+      initialVariant?.pots[0]
 
     return {
       initialVariantId: initialVariant?.id,
@@ -366,8 +427,8 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
 
   const paginatedProducts = useMemo(() => {
     const start = (page - 1) * perPage
-    return filteredProducts.slice(start, start + perPage)
-  }, [filteredProducts, page, perPage])
+    return sortedProducts.slice(start, start + perPage)
+  }, [page, perPage, sortedProducts])
 
   const pageItems: (number | 'ellipsis')[] = useMemo(() => {
     const items: (number | 'ellipsis')[] = []
@@ -598,7 +659,7 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
 
                       return (
                         <PlantCard
-                          key={`${product.slug}-${selectedPots.join(',')}`}
+                          key={`${product.slug}-${selectedPots.join(',')}-${appliedPriceRange.join('-')}-${inStockOnly}`}
                           {...displayProduct}
                           {...getInitialSelection(displayProduct)}
                         />

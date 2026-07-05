@@ -1,35 +1,43 @@
 import { CategoryCard } from '../categoryCard/CategoryCard'
 import * as motion from 'motion/react-client'
 
-import blueberryImage from '@/assets/plant-blueberry.jpg'
-import raspberryImage from '@/assets/plant-raspberry.jpg'
-import spruceImage from '@/assets/plant-spruce.jpg'
-import nurseryRowsImage from '@/assets/nursery-rows.jpg'
+import conifersImage from '@/assets/catalog-conifers-smaragd.png'
+import berriesImage from '@/assets/catalog-berries-blueberry-v4.png'
+import foliageImage from '@/assets/catalog-foliage.png'
+import perennialsImage from '@/assets/catalog-perennials.png'
 
 const categories = [
   {
     title: 'Хвойные',
     description: 'Туи, ели, сосны и можжевельники',
-    image: spruceImage.src,
+    image: conifersImage.src,
     href: '/catalog?category=conifers',
+    category: 'conifers' as const,
+    chips: ['Туи', 'Сосны', 'Можжевельники'],
   },
   {
     title: 'Ягодные',
-    description: 'Голубика, малина, ежевика, облепиха',
-    image: blueberryImage.src,
+    description: 'Голубика, малина, клюква и брусника',
+    image: berriesImage.src,
     href: '/catalog?category=berries',
+    category: 'berries' as const,
+    chips: ['Голубика', 'Малина', 'Ежевика', 'Брусника'],
   },
   {
     title: 'Лиственные',
     description: 'Декоративные кустарники и деревья',
-    image: nurseryRowsImage.src,
+    image: foliageImage.src,
     href: '/catalog?category=foliage',
+    category: 'foliage' as const,
+    chips: ['Пузыреплодник', 'Спирея', 'Дерен'],
   },
   {
     title: 'Многолетние',
-    description: 'Долговечные декоративные и плодовые многолетники',
-    image: raspberryImage.src,
+    description: 'Пионы, хосты, астильбы и другие садовые многолетники',
+    image: perennialsImage.src,
     href: '/catalog?category=perennials',
+    category: 'perennials' as const,
+    chips: ['Хосты', 'Пионы', 'Лилейники'],
   },
 ]
 
@@ -50,9 +58,18 @@ export function Categories() {
             Категории растений
           </h2>
         </motion.div>
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {categories.map((category) => (
-            <CategoryCard key={category.title} {...category} />
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {categories.map((category, index) => (
+            <motion.div
+              key={category.title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.52, ease: 'easeOut', delay: index * 0.06 }}
+            >
+              <CategoryCard {...category} />
+            </motion.div>
           ))}
         </div>
       </div>

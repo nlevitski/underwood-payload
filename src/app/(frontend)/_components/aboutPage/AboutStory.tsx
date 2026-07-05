@@ -1,7 +1,7 @@
 import * as motion from 'motion/react-client'
 import Image from 'next/image'
 
-import nurseryRowsImage from '@/assets/nursery-rows.jpg'
+import nurseryRowsImage from '@/assets/hero-nursery-thuja-angle-native-q85.webp'
 
 export function AboutStory() {
   return (
