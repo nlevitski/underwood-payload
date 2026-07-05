@@ -1,4 +1,4 @@
-import { env } from '@/lib/env'
+import { getEmailEnv } from '@/lib/env'
 import { getPayloadClient } from '@/lib/payload/client'
 import type { ContactSubmission } from '@/lib/telegram-message'
 
@@ -58,10 +58,11 @@ function formatContactEmailText(input: ContactSubmission) {
 }
 
 export async function sendContactToEmail(input: ContactSubmission) {
+  const emailEnv = getEmailEnv()
   const payload = await getPayloadClient()
 
   await payload.sendEmail({
-    to: env.SMTP_TARGET_EMAIL,
+    to: emailEnv.SMTP_TARGET_EMAIL,
     replyTo: input.email,
     subject: `Новая заявка с сайта Underwood: ${formatSubjectName(input.name)}`,
     html: formatContactEmailHtml(input),

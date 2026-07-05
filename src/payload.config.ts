@@ -18,28 +18,33 @@ import { ProductAges } from './collections/ProductAges/config'
 import { ProductSizes } from './collections/ProductSizes/config'
 import { ProductVariantTypes } from './collections/ProductVariantTypes/config'
 import { Articles } from './collections/Articles/config'
-import { env } from './lib/env'
+import { env, getEmailEnvIfConfigured } from './lib/env'
 import { ArticleAuthors } from './collections/ArticleAuthors/config'
 import { ProductPots } from './collections/ProductPots/config'
 import { ProductItemCares } from './collections/ProductItemCares/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
+const emailEnv = getEmailEnvIfConfigured()
 
 export default buildConfig({
-  email: nodemailerAdapter({
-    defaultFromAddress: env.SMTP_FROM_EMAIL,
-    defaultFromName: 'Underwood',
-    transportOptions: {
-      host: env.SMTP_HOST,
-      port: env.SMTP_EMAIL_PORT,
-      secure: env.SMTP_EMAIL_PORT === 465,
-      auth: {
-        user: env.SMTP_USER,
-        pass: env.SMTP_API_KEY,
-      },
-    },
-  }),
+  ...(emailEnv
+    ? {
+        email: nodemailerAdapter({
+          defaultFromAddress: emailEnv.SMTP_FROM_EMAIL,
+          defaultFromName: 'Underwood',
+          transportOptions: {
+            host: emailEnv.SMTP_HOST,
+            port: emailEnv.SMTP_EMAIL_PORT,
+            secure: emailEnv.SMTP_EMAIL_PORT === 465,
+            auth: {
+              user: emailEnv.SMTP_USER,
+              pass: emailEnv.SMTP_API_KEY,
+            },
+          },
+        }),
+      }
+    : {}),
   admin: {
     user: Users.slug,
     importMap: {
@@ -99,7 +104,7 @@ export default buildConfig({
         date: false,
         payment: false,
       },
-      defaultToEmail: env.SMTP_TARGET_EMAIL,
+      defaultToEmail: emailEnv?.SMTP_TARGET_EMAIL ?? 'info@underwood.by',
     }),
   ],
 })
