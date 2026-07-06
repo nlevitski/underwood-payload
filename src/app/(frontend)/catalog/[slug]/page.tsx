@@ -73,7 +73,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </div>
       </section>
 
-      <CareGuideSection cares={product.cares} />
+      <CareGuideSection product={product} />
 
       {similarProducts.length > 0 && (
         <section className="py-12 bg-background">

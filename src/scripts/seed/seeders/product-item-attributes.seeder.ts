@@ -1,6 +1,10 @@
 import type { Payload } from 'payload'
 import { productCatalog, type CatalogItemAttributes } from './product-catalog.data'
 
+type CatalogCategorySlug = (typeof productCatalog)[number]['categorySlug']
+type CatalogCategory = (typeof productCatalog)[number]
+type CatalogItem = CatalogCategory['items'][number]
+
 type ProductItemAttributeData = {
   item: number
   type?: string
@@ -27,7 +31,138 @@ function toTextValue(value: string | number | boolean): string {
   return value ? 'true' : 'false'
 }
 
-function toRipeningTime(value: string | number | boolean): ProductItemAttributeData['ripeningTime'] {
+const typeByCategorySlug: Partial<Record<CatalogCategorySlug, string>> = {
+  thuja: 'Хвойный вечнозелёный кустарник / дерево',
+  juniper: 'Хвойный вечнозелёный кустарник',
+  pine: 'Хвойное вечнозелёное дерево / кустарниковая форма',
+  spruce: 'Хвойное вечнозелёное дерево',
+  fir: 'Хвойное вечнозелёное дерево',
+  cypress: 'Хвойный вечнозелёный кустарник / дерево',
+  blueberry: 'Ягодный листопадный кустарник',
+  raspberry: 'Ягодный полукустарник',
+  blackberry: 'Ягодный полукустарник',
+  currant: 'Ягодный листопадный кустарник',
+  gooseberry: 'Ягодный листопадный кустарник',
+  lingonberry: 'Ягодный вечнозелёный кустарничек',
+  cranberry: 'Ягодный вечнозелёный кустарничек',
+  dogwood: 'Декоративный листопадный кустарник',
+  ninebark: 'Декоративный листопадный кустарник',
+  sage: 'Декоративный травянистый многолетник',
+  lavander: 'Декоративный ароматный многолетник',
+}
+
+const colorByCategorySlug: Partial<Record<CatalogCategorySlug, string>> = {
+  blueberry: 'Синяя / тёмно-синяя',
+  blackberry: 'Чёрная',
+  lingonberry: 'Красная',
+  cranberry: 'Тёмно-красная',
+}
+
+const growthFormByCategorySlug: Partial<Record<CatalogCategorySlug, string>> = {
+  raspberry: 'Кустовая форма с прямостоячими побегами',
+  currant: 'Кустовая форма',
+  sage: 'Кустистая куртина',
+  lavander: 'Компактный полукустарник',
+}
+
+const colorByItemKey: Record<string, string> = {
+  'thuja::Brabant': 'Ярко-зелёная',
+  'thuja::Woodwardii': 'Зелёная',
+  'thuja::Globosa': 'Зелёная',
+  'thuja::Golden Brabant': 'Золотистая',
+  'thuja::Golden Smaragd': 'Золотистая',
+  'thuja::Danica': 'Зелёная',
+  'thuja::Zebrina': 'Зелёная с золотистыми полосами',
+  'thuja::Columna': 'Зелёная',
+  'thuja::Kornik': 'Зелёная',
+  'thuja::Miriam': 'Золотисто-зелёная',
+  'thuja::Rheingold': 'Золотистая',
+  'thuja::Smaragd': 'Насыщенно-зелёная',
+  'thuja::Tiny Tim': 'Зелёная',
+  'thuja::Hoseri': 'Зелёная',
+  'thuja::Ericoides': 'Мягко-зелёная',
+  'juniper::Blue Carpet': 'Серебристо-голубая',
+  'juniper::Blue Star': 'Серебристо-голубая',
+  'juniper::Blue Chip': 'Голубовато-серая',
+  'juniper::Blue Arrow': 'Голубоватая',
+  'juniper::Wiltonii': 'Голубовато-зелёная',
+  'juniper::Glacier': 'Серебристо-голубая',
+  'juniper::Golden Carpet': 'Золотистая',
+  'juniper::Green Carpet': 'Зелёная',
+  'juniper::Cossack Juniper': 'Зелёная',
+  'juniper::Lime Glow': 'Лимонно-зелёная',
+  'juniper::Old Gold': 'Золотисто-бронзовая',
+  'juniper::Prince of Wales': 'Зелёная',
+  'juniper::Stricta': 'Голубовато-зелёная',
+  'juniper::Holger': 'Голубовато-зелёная с золотистым приростом',
+  'pine::Winter Gold': 'Зелёная летом, золотистая зимой',
+  'pine::Green Tower': 'Зелёная',
+  'pine::Maria Brigon': 'Зелёная',
+  'pine::Moseri': 'Зелёная',
+  'pine::Mugus': 'Зелёная',
+  'pine::Pumilio': 'Тёмно-зелёная',
+  'pine::Uncinata': 'Тёмно-зелёная',
+  'pine::Black Pine': 'Тёмно-зелёная',
+  'spruce::Glauca Globosa': 'Серебристо-голубая',
+  'spruce::Kaibab': 'Серебристо-синяя',
+  'spruce::Conica (Canadian)': 'Зелёная',
+  'spruce::Majestic Blue': 'Синевато-серебристая',
+  'spruce::Nidiformis': 'Зелёная',
+  'fir::Icebreaker': 'Серебристая',
+  'fir::Korean Fir': 'Тёмно-зелёная',
+  'fir::Nordmann Fir': 'Тёмно-зелёная',
+  'fir::Silberlocke': 'Синевато-зелёная с серебристо-белой нижней стороной',
+  "cypress::Lawson's Yvonne": 'Жёлто-зелёная',
+  'cypress::Plumosa Aurea': 'Золотистая',
+  'cypress::Sun Gold': 'Золотистая',
+  'cypress::Filifera Nana': 'Зелёная',
+  'raspberry::Rubifol': 'Красная',
+  'raspberry::Maravilla': 'Ярко-красная',
+  'raspberry::18-183-1': 'Красная',
+  'raspberry::Cascade Harvest': 'Красная',
+  'raspberry::Sokolytsa': 'Красная',
+  'raspberry::Cumberland': 'Чёрная',
+  'gooseberry::Kseniya': 'Красная',
+  'gooseberry::Pax': 'Красная',
+  'gooseberry::Orpheus': 'Жёлто-зелёная',
+  'sage::Woodland': 'Лилово-фиолетовая',
+  'lavander::Lavander': 'Фиолетовая / серо-зелёная листва',
+}
+
+const notesByItemKey: Record<string, string> = {
+  'juniper::Glacier': 'Компактная форма с холодным серебристо-голубым оттенком',
+  'juniper::Holger': 'Золотистый молодой прирост на голубовато-зелёной хвое',
+  'pine::Uncinata': 'Устойчивая горная сосна для природных композиций',
+  'sage::Woodland': 'Долгоцветущий ароматный многолетник, привлекает опылителей',
+  'lavander::Lavander': 'Ароматная культура для солнечных сухих участков и бордюров',
+}
+
+function getDefaultType(category: CatalogCategory): string | undefined {
+  return typeByCategorySlug[category.categorySlug]
+}
+
+function getDefaultGrowthForm(category: CatalogCategory, item: CatalogItem): string | undefined {
+  if (category.group === 'conifers' && isFilledValue(item.attributes.type)) {
+    return toTextValue(item.attributes.type)
+  }
+
+  return growthFormByCategorySlug[category.categorySlug]
+}
+
+function getDefaultColor(category: CatalogCategory, item: CatalogItem): string | undefined {
+  return (
+    colorByItemKey[`${category.categorySlug}::${item.name}`] ??
+    colorByCategorySlug[category.categorySlug]
+  )
+}
+
+function getDefaultNotes(category: CatalogCategory, item: CatalogItem): string | undefined {
+  return notesByItemKey[`${category.categorySlug}::${item.name}`]
+}
+
+function toRipeningTime(
+  value: string | number | boolean,
+): ProductItemAttributeData['ripeningTime'] {
   const textValue = toTextValue(value).toLowerCase()
 
   if (textValue.includes('ранний') && textValue.includes('средний')) {
@@ -56,16 +191,27 @@ function toRipeningTime(value: string | number | boolean): ProductItemAttributeD
   return undefined
 }
 
-function buildItemAttributeData(
+export function buildItemAttributeData(
   itemId: number,
+  category: CatalogCategory,
+  item: CatalogItem,
   attributes: CatalogItemAttributes,
 ): ProductItemAttributeData {
   const data: ProductItemAttributeData = {
     item: itemId,
   }
 
-  if (isFilledValue(attributes.type)) {
+  const defaultType = getDefaultType(category)
+  const defaultGrowthForm = getDefaultGrowthForm(category, item)
+  const defaultColor = getDefaultColor(category, item)
+  const defaultNotes = getDefaultNotes(category, item)
+
+  if (category.group === 'conifers' && isFilledValue(defaultType)) {
+    data.type = defaultType
+  } else if (isFilledValue(attributes.type)) {
     data.type = toTextValue(attributes.type)
+  } else if (isFilledValue(defaultType)) {
+    data.type = defaultType
   }
 
   if (isFilledValue(attributes.description)) {
@@ -76,6 +222,8 @@ function buildItemAttributeData(
     data.notes = toTextValue(attributes.notes)
   } else if (isFilledValue(attributes.features)) {
     data.notes = toTextValue(attributes.features)
+  } else if (isFilledValue(defaultNotes)) {
+    data.notes = defaultNotes
   }
 
   if (isFilledValue(attributes.ripeningTime)) {
@@ -84,10 +232,14 @@ function buildItemAttributeData(
 
   if (isFilledValue(attributes.growthForm)) {
     data.growthForm = toTextValue(attributes.growthForm)
+  } else if (isFilledValue(defaultGrowthForm)) {
+    data.growthForm = defaultGrowthForm
   }
 
   if (isFilledValue(attributes.color)) {
     data.color = toTextValue(attributes.color)
+  } else if (isFilledValue(defaultColor)) {
+    data.color = defaultColor
   }
 
   return data
@@ -176,7 +328,7 @@ export async function seedProductItemAttributes(payload: Payload) {
       createOperations.push(
         payload.create({
           collection: 'product-item-attributes',
-          data: buildItemAttributeData(itemId, item.attributes),
+          data: buildItemAttributeData(itemId, catalogCategory, item, item.attributes),
         }),
       )
     }

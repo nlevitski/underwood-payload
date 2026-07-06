@@ -308,6 +308,7 @@ export interface ProductItemCare {
   item: number | ProductItem;
   watering?: string | null;
   light?: string | null;
+  soil?: string | null;
   temperature?: string | null;
   size?: string | null;
   updatedAt: string;
@@ -928,6 +929,7 @@ export interface ProductItemCaresSelect<T extends boolean = true> {
   item?: T;
   watering?: T;
   light?: T;
+  soil?: T;
   temperature?: T;
   size?: T;
   updatedAt?: T;

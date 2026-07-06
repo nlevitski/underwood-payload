@@ -1,5 +1,5 @@
 export type CatalogItemCare = {
-  type: 'watering' | 'light' | 'temperature' | 'size'
+  type: 'watering' | 'light' | 'soil' | 'temperature' | 'size'
   description: string
 }
 

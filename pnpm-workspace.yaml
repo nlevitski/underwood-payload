@@ -1,11 +1,8 @@
+packages:
+  - .
+
 onlyBuiltDependencies:
-  - '2'
-  - a
   - esbuild
-  - g
   - msw
-  - n
-  - o
-  - r
   - sharp
   - unrs-resolver

@@ -24,6 +24,7 @@ export const ProductItemAttributes: CollectionConfig = {
     {
       name: 'displayName',
       type: 'text',
+      label: 'Имя',
       admin: {
         readOnly: true,
       },
@@ -35,23 +36,27 @@ export const ProductItemAttributes: CollectionConfig = {
       required: true,
       index: true,
       unique: true,
+      label: 'Товарная позиция',
     },
     {
       name: 'type',
       type: 'text',
+      label: 'Тип',
     },
     {
       name: 'notes',
       type: 'text',
+      label: 'Примечания',
     },
     {
       name: 'description',
       type: 'text',
+      label: 'Описание',
     },
     {
       name: 'ripeningTime',
       type: 'select',
-      label: 'Ripening Time',
+      label: 'Срок созревания',
       options: [
         {
           label: 'Ранний',
@@ -78,10 +83,12 @@ export const ProductItemAttributes: CollectionConfig = {
     {
       name: 'growthForm',
       type: 'text',
+      label: 'Форма роста',
     },
     {
       name: 'color',
       type: 'text',
+      label: 'Цвет кроны',
     },
   ],
   hooks: {

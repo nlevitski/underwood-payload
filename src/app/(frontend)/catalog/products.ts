@@ -48,8 +48,22 @@ export const sizePostfixes = ['см'] as const
 export type SizePostfix = (typeof sizePostfixes)[number]
 
 export type Care = {
-  type: 'watering' | 'light' | 'temperature' | 'size'
+  type: 'watering' | 'light' | 'soil' | 'temperature' | 'size'
   description: string
+}
+
+export type ProductAttributes = {
+  type?: string | null
+  notes?: string | null
+  description?: string | null
+  ripeningTime?: string | null
+  growthForm?: string | null
+  color?: string | null
+}
+
+export type ProductVideo = {
+  type: 'youtube' | 'instagram'
+  title: string
 }
 
 type ProductPot = {
@@ -92,7 +106,9 @@ export type Product = {
   id: string
   name: string
   description: string
+  attributes?: ProductAttributes | null
   cares: Care[]
+  videos?: ProductVideo[]
   valueType: ValueType
   variants: ProductVariant[]
 } & Category<CategoryKey>

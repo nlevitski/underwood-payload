@@ -12,7 +12,7 @@ import type {
 } from '@/payload-types'
 import type { Payload } from 'payload'
 
-import type { Care, CategoryKey, Product } from './products'
+import type { Care, CategoryKey, Product, ProductAttributes } from './products'
 
 type DBProductImageSize = {
   url: string
@@ -79,6 +79,13 @@ const categoryLabelsByKey = {
 const sizeValues = ['25-40', '35-50', '50-60', '60-70', '70-80', '80', '80-90', '90-120'] as const
 const categoryOrder = Object.keys(categoryLabelsByKey)
 const sizeOrder = new Map(sizeValues.map((size, index) => [size, index]))
+const ripeningTimeLabels = {
+  early: 'Ранний',
+  earlyMid: 'Ранний-средний',
+  midSeason: 'Средний',
+  midLate: 'Средний-поздний',
+  late: 'Поздний',
+} as const satisfies Record<NonNullable<ProductItemAttribute['ripeningTime']>, string>
 
 function isObjectRelation<T extends { id: number }>(relation: Relation<T>): relation is T {
   return typeof relation === 'object' && relation !== null
@@ -126,13 +133,38 @@ function resolveDescription(item: PayloadProductItem) {
   return attributes?.description ?? attributes?.notes ?? attributes?.type ?? ''
 }
 
+function normalizeTextValue(value: string | null | undefined) {
+  const normalized = value?.trim()
+
+  return normalized ? normalized : null
+}
+
+function resolveProductAttributes(item: PayloadProductItem): ProductAttributes | null {
+  const attributes = resolveAttributes(item)
+
+  if (!attributes) {
+    return null
+  }
+
+  const normalizedAttributes: ProductAttributes = {
+    type: normalizeTextValue(attributes.type),
+    notes: normalizeTextValue(attributes.notes),
+    description: normalizeTextValue(attributes.description),
+    ripeningTime: attributes.ripeningTime ? ripeningTimeLabels[attributes.ripeningTime] : null,
+    growthForm: normalizeTextValue(attributes.growthForm),
+    color: normalizeTextValue(attributes.color),
+  }
+
+  return Object.values(normalizedAttributes).some(Boolean) ? normalizedAttributes : null
+}
+
 function resolveCares(item: PayloadProductItem): Care[] {
   if (!isObjectRelation<ProductItemCare>(item.cares)) {
     return []
   }
 
   const cares = item.cares
-  const fields = ['watering', 'light', 'temperature', 'size'] as const
+  const fields = ['watering', 'light', 'soil', 'temperature', 'size'] as const
 
   return fields.flatMap((type) => {
     const description = cares[type]?.trim()
@@ -360,6 +392,7 @@ function normalizeProduct(groupedProduct: GroupedProduct): DBProduct | null {
     slug: groupedProduct.item.slug,
     name: resolveProductName(groupedProduct.item, groupedProduct.category),
     description: resolveDescription(groupedProduct.item),
+    attributes: resolveProductAttributes(groupedProduct.item),
     cares: resolveCares(groupedProduct.item),
     valueType: groupedProduct.variants[0]?.variantType ?? 'none',
     category: categoryLabelsByKey[groupedProduct.categoryKey],

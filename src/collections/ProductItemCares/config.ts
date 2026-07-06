@@ -1,12 +1,15 @@
 import type { CollectionConfig } from 'payload'
-import { hydrateItemCareDisplayNameHook, populateItemCareDisplayNameHook } from './hooks/populate-display-name.hook'
+import {
+  hydrateItemCareDisplayNameHook,
+  populateItemCareDisplayNameHook,
+} from './hooks/populate-display-name.hook'
 import { clearItemCareLinkHook, syncItemCareLinkHook } from './hooks/sync-item-link.hook'
 
 export const ProductItemCares: CollectionConfig = {
   slug: 'product-item-cares',
   admin: {
     useAsTitle: 'displayName',
-    defaultColumns: ['displayName', 'item', 'watering', 'light', 'temperature', 'size'],
+    defaultColumns: ['displayName', 'item', 'watering', 'light', 'soil', 'temperature', 'size'],
   },
   fields: [
     {
@@ -30,6 +33,10 @@ export const ProductItemCares: CollectionConfig = {
     },
     {
       name: 'light',
+      type: 'text',
+    },
+    {
+      name: 'soil',
       type: 'text',
     },
     {
