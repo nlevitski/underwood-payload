@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import type { ComponentType } from 'react'
+import type { ComponentType, ReactNode } from 'react'
 import Link from 'next/link'
 import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import * as motion from 'motion/react-client'
 
 import { ContactForm } from './ContactForm'
+import { WorkingHoursIndicator } from './WorkingHoursIndicator'
 
 export const metadata: Metadata = {
   title: 'Контакты | Underwood',
@@ -65,7 +66,9 @@ export default function ContactsPage() {
                     label="Часы работы"
                     value="Пн-Пт: 9:00 - 18:00, Сб: 9:00 - 17:00"
                     description="Воскресенье - выходной"
-                  />
+                  >
+                    <WorkingHoursIndicator />
+                  </ContactDetail>
                 </div>
               </div>
 
@@ -106,15 +109,23 @@ type ContactDetailProps = {
   value: string
   href?: string
   description: string
+  children?: ReactNode
 }
 
-function ContactDetail({ icon: Icon, label, value, href, description }: ContactDetailProps) {
+function ContactDetail({
+  icon: Icon,
+  label,
+  value,
+  href,
+  description,
+  children,
+}: ContactDetailProps) {
   const content = (
     <div className="flex gap-4">
       <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-accent">
         <Icon className="h-5 w-5 text-forest" />
       </div>
-      <div>
+      <div className="min-w-0">
         <h3 className="font-semibold text-foreground">{label}</h3>
         {href ? (
           <a href={href} className="text-muted-foreground transition-colors hover:text-forest">
@@ -124,6 +135,7 @@ function ContactDetail({ icon: Icon, label, value, href, description }: ContactD
           <p className="text-muted-foreground">{value}</p>
         )}
         <p className="text-sm text-muted-foreground">{description}</p>
+        {children}
       </div>
     </div>
   )
