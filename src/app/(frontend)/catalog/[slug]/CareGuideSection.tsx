@@ -130,9 +130,11 @@ export function CareGuideSection({ product }: CareGuideSectionProps) {
 
         <div className="grid gap-6 lg:grid-cols-3 lg:items-start">
           {hasLeftColumn && (
-            <div className={`${hasCareContent ? 'lg:col-span-2' : 'lg:col-span-3'} space-y-6`}>
+            <div
+              className={`${hasCareContent ? 'lg:col-span-2' : 'lg:col-span-3'} contents lg:block lg:space-y-6`}
+            >
               {hasBotanicalContent && (
-                <div className="bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden">
+                <div className="order-1 bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden">
                   <div className="px-5 sm:px-6 py-4 border-b border-border/70 flex items-center gap-2.5">
                     <Sprout className="h-4 w-4 text-forest" />
                     <h3 className="font-semibold text-foreground">Ботанические характеристики</h3>
@@ -181,7 +183,7 @@ export function CareGuideSection({ product }: CareGuideSectionProps) {
               )}
 
               {videos.length > 0 && (
-                <div className="bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden">
+                <div className="order-3 bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden">
                   <div className="px-5 sm:px-6 py-4 border-b border-border/70 flex items-center gap-2.5">
                     <Video className="h-4 w-4 text-forest" />
                     <h3 className="font-semibold text-foreground">Видеообзоры</h3>
@@ -220,7 +222,7 @@ export function CareGuideSection({ product }: CareGuideSectionProps) {
 
           {hasCareContent && (
             <aside
-              className={`bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden ${
+              className={`order-2 bg-background rounded-2xl border border-border/70 shadow-soft overflow-hidden ${
                 hasLeftColumn ? 'lg:sticky lg:top-24' : 'lg:col-span-3'
               }`}
             >

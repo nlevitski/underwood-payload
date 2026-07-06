@@ -112,7 +112,14 @@ function resolveCategoryKey(category: PayloadProductCategory): CategoryKey | nul
 }
 
 function resolveProductName(item: PayloadProductItem, category: PayloadProductCategory) {
-  return `${category.nameRu} ${item.nameRu}`.trim()
+  const categoryName = category.nameRu.trim()
+  const itemName = item.nameRu.trim()
+
+  if (categoryName.toLocaleLowerCase('ru') === itemName.toLocaleLowerCase('ru')) {
+    return itemName
+  }
+
+  return `${categoryName} ${itemName}`.trim()
 }
 
 function resolveProductImage(categoryKey: CategoryKey) {

@@ -39,7 +39,7 @@ export function CategoryCard({ title, description, image, href, category, chips 
       data-category={category}
       aria-label={`Открыть каталог: ${title}`}
       className={cn(
-        'category-card group relative isolate grid aspect-[16/9] overflow-hidden rounded-[24px] border bg-[oklch(99%_0.002_92)] shadow-[0_18px_44px_oklch(26%_0.045_126_/_0.13)] outline-none transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_22px_50px_oklch(26%_0.045_126_/_0.18)] focus-visible:translate-y-[-2px] focus-visible:shadow-[0_22px_50px_oklch(26%_0.045_126_/_0.18),_0_0_0_4px_color-mix(in_oklch,var(--focus)_22%,transparent)] focus-visible:ring-0',
+        'category-card group relative isolate grid aspect-[16/9] overflow-hidden rounded-[24px] border bg-[oklch(99%_0.002_92)] shadow-[0_18px_44px_oklch(26%_0.045_126_/_0.13)] outline-none transition-[border-color,box-shadow] duration-200 ease-out hover:shadow-[0_22px_50px_oklch(26%_0.045_126_/_0.18)] focus-visible:shadow-[0_22px_50px_oklch(26%_0.045_126_/_0.18),_0_0_0_4px_color-mix(in_oklch,var(--focus)_22%,transparent)] focus-visible:ring-0',
         'max-md:min-h-[238px] max-md:aspect-auto max-md:rounded-[20px]',
       )}
       style={
@@ -70,7 +70,7 @@ export function CategoryCard({ title, description, image, href, category, chips 
       <span
         aria-hidden="true"
         className={cn(
-          'absolute right-[18px] top-[18px] z-20 grid h-[42px] w-[42px] place-items-center rounded-full border opacity-70 transition-[transform,opacity,background-color] duration-200 ease-out group-hover:translate-x-0.5 group-hover:opacity-100 group-focus-visible:translate-x-0.5 group-focus-visible:opacity-100',
+          'absolute right-[18px] top-[18px] z-20 grid h-[42px] w-[42px] place-items-center rounded-full border opacity-70 transition-[opacity,background-color] duration-200 ease-out group-hover:opacity-100 group-focus-visible:opacity-100',
           'max-md:right-[14px] max-md:top-[14px] max-md:h-[38px] max-md:w-[38px]',
         )}
         style={
