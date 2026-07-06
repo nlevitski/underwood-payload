@@ -110,61 +110,92 @@ export function PlantCard(props: PlantCardProps) {
 
         <div className="relative z-20" onMouseLeave={clearHoverSelection}>
           {hasVariantSelection && (
-            <div>
-              <p className="text-xs text-muted-foreground mb-1.5 block">{variantLabel}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {props.variants.map((variant) => {
-                  const variantWithValue = variant as VariantWithValue
+            <div className="flex">
+              <div className="min-w-0 flex-[2]">
+                <p className="text-xs text-muted-foreground mb-1.5 block">{variantLabel}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {props.variants.map((variant) => {
+                    const variantWithValue = variant as VariantWithValue
 
-                  return (
+                    return (
+                      <button
+                        key={variant.id}
+                        type="button"
+                        onClick={() => {
+                          toggleVariant(variant.id)
+                        }}
+                        onMouseEnter={() => handleVariantHover(variant.id)}
+                        aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
+                        className={`inline-flex h-7 flex-none items-center justify-center rounded-full px-2.5 text-xs font-medium leading-none whitespace-nowrap transition-colors ${
+                          variant.id === variantId
+                            ? 'bg-forest text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-accent'
+                        }`}
+                      >
+                        {`${variantWithValue.value} ${variantWithValue.postfix}`}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="ml-1 min-w-0 flex-1 border-l border-border pl-1 min-[340px]:ml-2 min-[340px]:pl-2 sm:ml-3 sm:pl-3">
+                <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {currentVariant.pots.map((pot) => (
                     <button
-                      key={variant.id}
+                      key={pot.id}
                       type="button"
                       onClick={() => {
-                        toggleVariant(variant.id)
+                        setPotId(pot.id)
+                        setHoveredPotId(null)
                       }}
-                      onMouseEnter={() => handleVariantHover(variant.id)}
-                      aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                        variant.id === variantId
-                          ? 'bg-forest text-primary-foreground'
-                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                      onMouseEnter={() => handlePotHover(pot.id)}
+                      aria-label={normalizePotCode(pot.name)}
+                      className={`inline-flex h-7 flex-none items-center justify-center rounded-full px-2.5 text-xs font-medium leading-none whitespace-nowrap transition-colors ${
+                        hoveredPotId === pot.id
+                          ? 'bg-accent text-accent-foreground'
+                          : pot.id === potId
+                            ? 'bg-forest text-primary-foreground'
+                            : 'bg-muted text-muted-foreground hover:bg-accent'
                       }`}
                     >
-                      {`${variantWithValue.value} ${variantWithValue.postfix}`}
+                      {normalizePotCode(pot.name)}
                     </button>
-                  )
-                })}
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          <div className="mt-3">
-            <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
-            <div className="flex flex-wrap gap-1.5">
-              {(hasVariantSelection ? currentVariant.pots : allPots).map((pot) => (
-                <button
-                  key={pot.id}
-                  type="button"
-                  onClick={() => {
-                    setPotId(pot.id)
-                    setHoveredPotId(null)
-                  }}
-                  onMouseEnter={() => handlePotHover(pot.id)}
-                  aria-label={normalizePotCode(pot.name)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    hoveredPotId === pot.id
-                      ? 'bg-accent text-accent-foreground'
-                      : pot.id === potId
-                        ? 'bg-forest text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-accent'
-                  }`}
-                >
-                  {normalizePotCode(pot.name)}
-                </button>
-              ))}
+          {!hasVariantSelection && (
+            <div>
+              <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
+              <div className="flex flex-wrap gap-1.5">
+                {allPots.map((pot) => (
+                  <button
+                    key={pot.id}
+                    type="button"
+                    onClick={() => {
+                      setPotId(pot.id)
+                      setHoveredPotId(null)
+                    }}
+                    onMouseEnter={() => handlePotHover(pot.id)}
+                    aria-label={normalizePotCode(pot.name)}
+                    className={`inline-flex h-7 flex-none items-center justify-center rounded-full px-2.5 text-xs font-medium leading-none whitespace-nowrap transition-colors ${
+                      hoveredPotId === pot.id
+                        ? 'bg-accent text-accent-foreground'
+                        : pot.id === potId
+                          ? 'bg-forest text-primary-foreground'
+                          : 'bg-muted text-muted-foreground hover:bg-accent'
+                    }`}
+                  >
+                    {normalizePotCode(pot.name)}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mt-auto flex items-center justify-between pt-2">
