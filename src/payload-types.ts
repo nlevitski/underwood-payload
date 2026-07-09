@@ -320,7 +320,7 @@ export interface ProductItemCare {
  */
 export interface ProductSize {
   id: number;
-  label: '25-40' | '35-50' | '50-60' | '60-70' | '70-80' | '80' | '80-90' | '90-120';
+  label: '25-40' | '35-50' | '40-60' | '50-60' | '60-70' | '70-80' | '80' | '80-90' | '90-120';
   updatedAt: string;
   createdAt: string;
 }

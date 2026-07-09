@@ -15,6 +15,8 @@ You are an expert Payload CMS developer. When working with Payload projects, fol
 
 - To validate typescript correctness after modifying code run `tsc --noEmit`
 - Generate import maps after creating or modifying components.
+- Before starting a project, check whether it is already running; if it is, work with the existing process instead of launching a new one.
+- Before running a project, verify whether `corepack` is needed to start it correctly.
 
 ## Project Structure
 

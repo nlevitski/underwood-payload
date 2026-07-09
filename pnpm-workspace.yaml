@@ -6,3 +6,6 @@ onlyBuiltDependencies:
   - msw
   - sharp
   - unrs-resolver
+
+patchedDependencies:
+  '@payloadcms/next@3.85.2': patches/@payloadcms__next@3.85.2.patch

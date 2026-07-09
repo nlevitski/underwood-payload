@@ -1,4 +1,5 @@
 import { getPayloadClient } from '@/lib/payload/client'
+import type { Article } from '@/payload-types'
 import { statusOptions } from './constants'
 
 export async function getArticles() {
@@ -25,7 +26,7 @@ export async function getArticles() {
       },
       sort: 'id',
     })
-    return articles ?? []
+    return (articles ?? []) as Article[]
   } catch (error) {
     console.error('Error fetching articles:', error)
     return []
@@ -46,7 +47,7 @@ export async function getArticleSlugs() {
         slug: true,
       },
     })
-    return articles ?? []
+    return (articles ?? []) as Pick<Article, 'slug'>[]
   } catch (error) {
     console.error('Error fetching article:', error)
     return []
@@ -69,9 +70,9 @@ export async function getArticleBySlug(slug: string) {
       },
       limit: 1,
     })
-    return articles ?? []
+    return ((articles ?? [])[0] ?? null) as Article | null
   } catch (error) {
     console.error('Error fetching article:', error)
-    return []
+    return null
   }
 }

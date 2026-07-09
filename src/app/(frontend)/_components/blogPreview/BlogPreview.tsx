@@ -3,9 +3,11 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { BlogCard } from '../blogCard/BlogCard'
-import { blogPosts } from '../../blog/data'
+import { getBlogPosts } from '../../blog/data'
 
-export function BlogPreview() {
+export async function BlogPreview() {
+  const blogPosts = await getBlogPosts()
+
   return (
     <section className="py-20">
       <div className="container">

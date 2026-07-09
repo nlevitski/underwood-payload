@@ -4,19 +4,22 @@ import { redirect } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
+import { RichText } from '@payloadcms/richtext-lexical/react'
 
 import { Button } from '@/components/ui/button'
 
 import { BlogCard } from '../../_components/blogCard/BlogCard'
-import { blogPosts, getBlogPost, getRelatedPosts } from '../data'
+import { getBlogPost, getBlogPostSlugs, getRelatedPosts } from '../data'
 
-export function generateStaticParams() {
-  return blogPosts.map(({ id }) => ({ slug: id }))
+export const dynamic = 'force-dynamic'
+
+export async function generateStaticParams() {
+  return getBlogPostSlugs()
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
-  const post = getBlogPost(slug)
+  const post = await getBlogPost(slug)
 
   if (!post) {
     return {
@@ -32,13 +35,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = getBlogPost(slug)
+  const post = await getBlogPost(slug)
 
   if (!post) {
     redirect('/blog')
   }
 
-  const related = getRelatedPosts(post.id, 3)
+  const related = await getRelatedPosts(post.id, 3)
 
   return (
     <>
@@ -112,33 +115,48 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               transition={{ duration: 0.4, delay: 0.2 }}
               className="space-y-8"
             >
-              <p className="text-lg font-medium leading-relaxed text-foreground/90">{post.intro}</p>
-
-              {post.sections.map((section, idx) => (
-                <section key={idx} className="space-y-4">
-                  {section.heading ? (
-                    <h2 className="pt-2 text-2xl font-bold text-foreground">{section.heading}</h2>
-                  ) : null}
-                  {section.paragraphs?.map((paragraph, paragraphIndex) => (
-                    <p key={paragraphIndex} className="text-base leading-relaxed text-foreground/80">
-                      {paragraph}
+              {post.content ? (
+                <RichText
+                  className="blog-rich-text"
+                  data={post.content}
+                  disableIndent
+                  disableTextAlign
+                />
+              ) : (
+                <>
+                  {post.intro ? (
+                    <p className="text-lg font-medium leading-relaxed text-foreground/90">
+                      {post.intro}
                     </p>
-                  ))}
-                  {section.list ? (
-                    <ul className="space-y-2 pl-1">
-                      {section.list.map((item, itemIndex) => (
-                        <li
-                          key={itemIndex}
-                          className="flex gap-3 text-base leading-relaxed text-foreground/80"
-                        >
-                          <span className="mt-1.5 font-bold leading-none text-forest">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
                   ) : null}
-                </section>
-              ))}
+
+                  {post.sections?.map((section, idx) => (
+                    <section key={idx} className="space-y-4">
+                      {section.heading ? (
+                        <h2 className="pt-2 text-2xl font-bold text-foreground">{section.heading}</h2>
+                      ) : null}
+                      {section.paragraphs?.map((paragraph, paragraphIndex) => (
+                        <p key={paragraphIndex} className="text-base leading-relaxed text-foreground/80">
+                          {paragraph}
+                        </p>
+                      ))}
+                      {section.list ? (
+                        <ul className="space-y-2 pl-1">
+                          {section.list.map((item, itemIndex) => (
+                            <li
+                              key={itemIndex}
+                              className="flex gap-3 text-base leading-relaxed text-foreground/80"
+                            >
+                              <span className="mt-1.5 font-bold leading-none text-forest">•</span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </section>
+                  ))}
+                </>
+              )}
             </motion.div>
 
             <div className="mt-12 rounded-2xl border border-border/50 bg-cream-dark p-6 md:p-8">

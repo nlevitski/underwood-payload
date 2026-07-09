@@ -3,14 +3,18 @@ import Link from 'next/link'
 import * as motion from 'motion/react-client'
 
 import { BlogCard } from '../_components/blogCard/BlogCard'
-import { blogPosts } from './data'
+import { getBlogPosts } from './data'
 
 export const metadata: Metadata = {
   title: 'Блог | Underwood',
   description: 'Полезные статьи по уходу за растениями и агротехнике.',
 }
 
-export default function BlogPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function BlogPage() {
+  const blogPosts = await getBlogPosts()
+
   return (
     <>
       <section className="bg-cream-dark py-12">
