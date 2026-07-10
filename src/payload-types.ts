@@ -81,6 +81,7 @@ export interface Config {
     'product-variants': ProductVariant;
     'gallery-images': GalleryImage;
     'homepage-category-cards': HomepageCategoryCard;
+    'homepage-popular-plants': HomepagePopularPlant;
     articles: Article;
     'article-authors': ArticleAuthor;
     pages: Page;
@@ -107,6 +108,7 @@ export interface Config {
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     'gallery-images': GalleryImagesSelect<false> | GalleryImagesSelect<true>;
     'homepage-category-cards': HomepageCategoryCardsSelect<false> | HomepageCategoryCardsSelect<true>;
+    'homepage-popular-plants': HomepagePopularPlantsSelect<false> | HomepagePopularPlantsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-authors': ArticleAuthorsSelect<false> | ArticleAuthorsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -422,6 +424,34 @@ export interface HomepageCategoryCard {
    * Доступны только роды из выбранной выше группы. Их названия станут чипами.
    */
   categories?: (number | ProductCategory)[] | null;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Товары раздела «Востребованные растения» на главной. Выбранная вариация будет показана первой, остальные останутся доступны в карточке.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-popular-plants".
+ */
+export interface HomepagePopularPlant {
+  id: number;
+  /**
+   * Обязательное поле. Сначала выберите группу растений.
+   */
+  group?: (number | null) | ProductGroup;
+  /**
+   * Обязательное поле. Доступны только категории из выбранной группы.
+   */
+  category?: (number | null) | ProductCategory;
+  /**
+   * Доступны только товары из выбранной категории.
+   */
+  product: number | ProductItem;
+  /**
+   * Список станет доступен после выбора товара и покажет только его вариации. Вариация определяет начальные размер/возраст, горшок, цену и изображение.
+   */
+  defaultVariant: number | ProductVariant;
   sortOrder: number;
   updatedAt: string;
   createdAt: string;
@@ -769,6 +799,10 @@ export interface PayloadLockedDocument {
         value: number | HomepageCategoryCard;
       } | null)
     | ({
+        relationTo: 'homepage-popular-plants';
+        value: number | HomepagePopularPlant;
+      } | null)
+    | ({
         relationTo: 'articles';
         value: number | Article;
       } | null)
@@ -1085,6 +1119,19 @@ export interface HomepageCategoryCardsSelect<T extends boolean = true> {
   image?: T;
   group?: T;
   categories?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-popular-plants_select".
+ */
+export interface HomepagePopularPlantsSelect<T extends boolean = true> {
+  group?: T;
+  category?: T;
+  product?: T;
+  defaultVariant?: T;
   sortOrder?: T;
   updatedAt?: T;
   createdAt?: T;

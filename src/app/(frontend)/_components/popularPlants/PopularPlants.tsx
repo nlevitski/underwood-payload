@@ -5,14 +5,12 @@ import * as motion from 'motion/react-client'
 
 import { getPayloadClient } from '@/lib/payload/client'
 
-import { getDbProducts } from '../../catalog/dbProducts'
+import { getHomepagePopularPlants } from '@/collections/HomepagePopularPlants/fetchers'
 import { PlantCard } from '../plantCard/PlantCard'
-
-const popularPlantsLimit = 4
 
 export async function PopularPlants() {
   const payload = await getPayloadClient()
-  const popularPlants = (await getDbProducts(payload)).slice(0, popularPlantsLimit)
+  const popularPlants = await getHomepagePopularPlants(payload)
 
   if (popularPlants.length === 0) {
     return null

@@ -2,6 +2,7 @@ import type { Payload } from 'payload'
 import { DEFAULT_POT_CODE } from '@/collections/ProductPots/constants'
 
 const resetCollectionsOrder = [
+  'homepage-popular-plants',
   'homepage-category-cards',
   'product-variants',
   'product-item-attributes',

@@ -24,12 +24,15 @@ import { ProductPots } from './collections/ProductPots/config'
 import { ProductItemCares } from './collections/ProductItemCares/config'
 import { GalleryImages } from './collections/GalleryImages/config'
 import { HomepageCategoryCards } from './collections/HomepageCategoryCards/config'
+import { HomepagePopularPlants } from './collections/HomepagePopularPlants/config'
+import { backfillHomepagePopularPlantHierarchy } from './collections/HomepagePopularPlants/backfill-hierarchy'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const emailEnv = getEmailEnvIfConfigured()
 
 export default buildConfig({
+  onInit: backfillHomepagePopularPlantHierarchy,
   ...(emailEnv
     ? {
         email: nodemailerAdapter({
@@ -73,6 +76,7 @@ export default buildConfig({
     ProductVariants,
     GalleryImages,
     HomepageCategoryCards,
+    HomepagePopularPlants,
     Articles,
     ArticleAuthors,
     {

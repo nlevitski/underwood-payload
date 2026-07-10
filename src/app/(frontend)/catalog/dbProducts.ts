@@ -49,9 +49,14 @@ type DBProductVariantWithValue = DBProductVariantBase & {
 type DBProductVariant = DBProductVariantBase | DBProductVariantWithValue
 
 export type DBProduct = Omit<Product, 'id' | 'image' | 'variants'> & {
+  itemId: number
   slug: string
   image: string
   variants: DBProductVariant[]
+}
+
+type GetDbProductsOptions = {
+  itemIds?: number[]
 }
 
 type GroupedProduct = {
@@ -386,6 +391,7 @@ function normalizeProduct(groupedProduct: GroupedProduct): DBProduct | null {
   }
 
   return {
+    itemId: groupedProduct.item.id,
     slug: groupedProduct.item.slug,
     name: resolveProductName(groupedProduct.item, groupedProduct.category),
     description: resolveDescription(groupedProduct.item),
@@ -434,13 +440,25 @@ function groupVariantsByProduct(variants: PayloadProductVariant[]) {
   return Array.from(groupedProducts.values())
 }
 
-export async function getDbProducts(payload: Payload): Promise<DBProduct[]> {
+export async function getDbProducts(
+  payload: Payload,
+  options: GetDbProductsOptions = {},
+): Promise<DBProduct[]> {
   const { docs } = await payload.find({
     collection: 'product-variants',
     depth: 3,
     pagination: false,
     limit: 0,
     sort: 'id',
+    ...(options.itemIds?.length
+      ? {
+          where: {
+            item: {
+              in: options.itemIds,
+            },
+          },
+        }
+      : {}),
   })
 
   return groupVariantsByProduct(docs)
