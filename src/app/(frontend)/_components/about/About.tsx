@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
 
-const nurseryImageSrc = '/api/media/file/IMG_4676.webp'
+const nurseryImageSrc = '/api/media/file/nursery_perspective_IMG_4676.webp'
 
 export function About() {
   return (

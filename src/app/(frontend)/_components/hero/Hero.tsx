@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
 import { cn } from '@/lib/utils'
 
-const heroImageSrc = '/api/media/file/IMG_4682.webp'
+const heroImageSrc = '/api/media/file/nursery_perspective_IMG_4682.webp'
 
 type HeroProps = {
   title?: ReactNode

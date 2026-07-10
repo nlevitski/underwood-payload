@@ -179,6 +179,10 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  /**
+   * Включайте для карточек товаров. Если выключить, версии фото сохранят пропорции исходника.
+   */
+  cropToSquare?: boolean | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -807,6 +811,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  cropToSquare?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

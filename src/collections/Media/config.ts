@@ -4,32 +4,41 @@ import sharp from 'sharp'
 import fs from 'fs/promises'
 import path from 'path'
 
+import { configureMediaImageSizesHook } from './hooks/configure-image-sizes.hook'
+import { createMediaImageSizes } from './image-sizes'
+
 export const Media: CollectionConfig = {
   slug: 'media',
   access: { read: () => true },
 
   upload: {
     crop: true,
-    imageSizes: [
-      { name: 'xs', width: 320, height: 320, formatOptions: { format: 'webp', options: { quality: 85 } } },
-      { name: 's', width: 640, height: 640, formatOptions: { format: 'webp', options: { quality: 85 } } },
-      { name: 'm', width: 960, height: 960, formatOptions: { format: 'webp', options: { quality: 85 } } },
-      { name: 'l', width: 1600, height: 1600, formatOptions: { format: 'webp', options: { quality: 85 } } },
-      { name: 'xl', width: 2400, height: 2400, formatOptions: { format: 'webp', options: { quality: 85 } } },
-      { name: 'xxl', width: 3024, height: 3024, formatOptions: { format: 'webp', options: { quality: 85 } } },
-    ],
+    imageSizes: createMediaImageSizes(true),
   },
 
-  fields: [{ name: 'alt', type: 'text', required: true }],
+  fields: [
+    { name: 'alt', type: 'text', required: true },
+    {
+      name: 'cropToSquare',
+      type: 'checkbox',
+      defaultValue: true,
+      label: 'Кадрировать до 1:1',
+      admin: {
+        description:
+          'Включайте для карточек товаров. Если выключить, версии фото сохранят пропорции исходника.',
+        position: 'sidebar',
+      },
+    },
+  ],
 
   hooks: {
     beforeOperation: [
+      configureMediaImageSizesHook,
       async ({ req, operation }) => {
         if (operation !== 'create' && operation !== 'update') return
         if (!req.file?.data || !req.file?.mimetype) return
 
-        const isHeic =
-          req.file.mimetype.includes('heic') || req.file.mimetype.includes('heif')
+        const isHeic = req.file.mimetype.includes('heic') || req.file.mimetype.includes('heif')
 
         if (!isHeic) return
 
@@ -56,13 +65,18 @@ export const Media: CollectionConfig = {
     ],
 
     afterChange: [
-      async ({ doc, previousDoc, req, operation, context }) => {
+      async ({ collection, doc, previousDoc, req, operation, context }) => {
         // Пропускаем если хук уже запущен нами (защита от бесконечного цикла)
-        if (context.skipFocalRegen) return
+        if (context.skipMediaRegen) return
 
-        // Только при обновлении и только если фокальная точка изменилась
+        // Пересоздаём версии, если изменилась фокальная точка или режим кадрирования.
         if (operation !== 'update') return
-        if (doc.focalX === previousDoc?.focalX && doc.focalY === previousDoc?.focalY) return
+        const focalPointChanged =
+          doc.focalX !== previousDoc?.focalX || doc.focalY !== previousDoc?.focalY
+        const cropModeChanged =
+          (doc.cropToSquare !== false) !== (previousDoc?.cropToSquare !== false)
+
+        if (!focalPointChanged && !cropModeChanged) return
 
         // Если в этом же запросе уже был загружен новый файл — Payload и так
         // пересоздал размеры, повторно не нужно
@@ -73,7 +87,12 @@ export const Media: CollectionConfig = {
 
         try {
           // Читаем оригинальный файл с диска
-          const uploadDir = path.resolve(process.cwd(), 'media')
+          const uploadDir =
+            collection.upload &&
+            typeof collection.upload === 'object' &&
+            collection.upload.staticDir
+              ? collection.upload.staticDir
+              : path.resolve(process.cwd(), 'media')
           const filePath = path.join(uploadDir, filename)
           const fileBuffer = await fs.readFile(filePath)
 
@@ -91,21 +110,24 @@ export const Media: CollectionConfig = {
 
           // Пересоздаём размеры через payload.update с файлом в req
           // Используем overrideAccess: true — это серверная операция
-          await req.payload.update({
+          const regeneratedMedia = await req.payload.update({
             collection: 'media',
             id: doc.id,
-            data: {},
+            data: { cropToSquare: doc.cropToSquare !== false },
             file: {
               data: fileBuffer,
               mimetype,
               name: filename,
               size: fileBuffer.byteLength,
             },
-            context: { skipFocalRegen: true },
+            context: { ...context, skipMediaRegen: true },
+            overrideAccess: true,
             req,
           })
+
+          return regeneratedMedia
         } catch (e) {
-          console.error('Focal point regeneration failed:', e)
+          console.error('Media size regeneration failed:', e)
         }
       },
     ],
