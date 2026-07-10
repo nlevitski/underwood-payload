@@ -1,7 +1,7 @@
 import * as motion from 'motion/react-client'
 import Image from 'next/image'
 
-import nurseryRowsImage from '@/assets/hero-nursery-thuja-angle-native-q85.webp'
+const nurseryImageSrc = '/api/media/file/IMG_4676.webp'
 
 export function AboutStory() {
   return (
@@ -44,8 +44,8 @@ export function AboutStory() {
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-elevated">
               <Image
-                src={nurseryRowsImage}
-                alt="Ряды растений"
+                src={nurseryImageSrc}
+                alt="Общий вид питомника Underwood"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"

@@ -6,7 +6,7 @@ import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
 import { cn } from '@/lib/utils'
 
-import heroImage from '@/assets/hero-nursery-thuja-main-native-q85.webp'
+const heroImageSrc = '/api/media/file/IMG_4682.webp'
 
 type HeroProps = {
   title?: ReactNode
@@ -34,7 +34,7 @@ export function Hero({
   ),
   breadcrumb,
   actions,
-  imageSrc = heroImage.src,
+  imageSrc = heroImageSrc,
   imageAlt = 'Питомник Underwood',
   heightClassName = 'min-h-[85vh]',
   containerPaddingClassName = 'py-20',

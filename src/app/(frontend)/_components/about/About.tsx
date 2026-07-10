@@ -3,7 +3,9 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
-import nurseryRowsImage from '@/assets/hero-nursery-thuja-angle-native-q85.webp'
+
+const nurseryImageSrc = '/api/media/file/IMG_4676.webp'
+
 export function About() {
   return (
     <section className="py-20">
@@ -48,8 +50,8 @@ export function About() {
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-elevated">
               <Image
-                src={nurseryRowsImage}
-                alt="Ряды растений в питомнике"
+                src={nurseryImageSrc}
+                alt="Общий вид питомника Underwood"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
