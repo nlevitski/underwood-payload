@@ -17,7 +17,11 @@ export async function generateStaticParams() {
   return getBlogPostSlugs()
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
   const { slug } = await params
   const post = await getBlogPost(slug)
 
@@ -122,41 +126,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   disableIndent
                   disableTextAlign
                 />
-              ) : (
-                <>
-                  {post.intro ? (
-                    <p className="text-lg font-medium leading-relaxed text-foreground/90">
-                      {post.intro}
-                    </p>
-                  ) : null}
-
-                  {post.sections?.map((section, idx) => (
-                    <section key={idx} className="space-y-4">
-                      {section.heading ? (
-                        <h2 className="pt-2 text-2xl font-bold text-foreground">{section.heading}</h2>
-                      ) : null}
-                      {section.paragraphs?.map((paragraph, paragraphIndex) => (
-                        <p key={paragraphIndex} className="text-base leading-relaxed text-foreground/80">
-                          {paragraph}
-                        </p>
-                      ))}
-                      {section.list ? (
-                        <ul className="space-y-2 pl-1">
-                          {section.list.map((item, itemIndex) => (
-                            <li
-                              key={itemIndex}
-                              className="flex gap-3 text-base leading-relaxed text-foreground/80"
-                            >
-                              <span className="mt-1.5 font-bold leading-none text-forest">•</span>
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </section>
-                  ))}
-                </>
-              )}
+              ) : null}
             </motion.div>
 
             <div className="mt-12 rounded-2xl border border-border/50 bg-cream-dark p-6 md:p-8">

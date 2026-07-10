@@ -20,7 +20,7 @@ export const GalleryImages: CollectionConfig = {
     {
       name: 'image',
       label: 'Фотография',
-      type: 'relationship',
+      type: 'upload',
       relationTo: 'media',
       required: true,
       unique: true,

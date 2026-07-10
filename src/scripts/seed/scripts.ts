@@ -14,6 +14,7 @@ import { seedProductItemCares } from './seeders/product-item-cares.seeder'
 import { seedProductVariantTypes } from './seeders/product-variant-types.seeder'
 import { seedProductVariants } from './seeders/product-variants.seeder'
 import { seedProductItemAttributes } from './seeders/product-item-attributes.seeder'
+import { seedHomepageCategoryCards } from './seeders/homepage-category-cards.seeder'
 
 process.env.PAYLOAD_MIGRATING ??= process.env.SEED_DISABLE_SCHEMA_PUSH === 'true' ? 'true' : 'false'
 if (process.env.NODE_ENV !== 'production') {
@@ -36,6 +37,7 @@ async function main() {
     await seedArticles(payload, author.id)
     await seedProductGroups(payload)
     await seedProductCategories(payload)
+    await seedHomepageCategoryCards(payload)
     await Promise.all([
       seedProductAges(payload),
       seedProductSizes(payload),

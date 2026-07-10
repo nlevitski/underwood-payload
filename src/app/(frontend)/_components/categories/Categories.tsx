@@ -1,47 +1,17 @@
 import { CategoryCard } from '../categoryCard/CategoryCard'
 import * as motion from 'motion/react-client'
 
-import conifersImage from '@/assets/catalog-conifers-smaragd.png'
-import berriesImage from '@/assets/catalog-berries-blueberry-v4.png'
-import foliageImage from '@/assets/catalog-foliage.png'
-import perennialsImage from '@/assets/catalog-perennials.png'
+import { getHomepageCategoryCards } from '@/collections/HomepageCategoryCards/fetchers'
+import { getPayloadClient } from '@/lib/payload/client'
 
-const categories = [
-  {
-    title: 'Хвойные',
-    description: 'Туи, ели, сосны и можжевельники',
-    image: conifersImage.src,
-    href: '/catalog?category=conifers',
-    category: 'conifers' as const,
-    chips: ['Туи', 'Сосны', 'Можжевельники'],
-  },
-  {
-    title: 'Ягодные',
-    description: 'Голубика, малина, клюква и брусника',
-    image: berriesImage.src,
-    href: '/catalog?category=berries',
-    category: 'berries' as const,
-    chips: ['Голубика', 'Малина', 'Ежевика', 'Брусника'],
-  },
-  {
-    title: 'Лиственные',
-    description: 'Декоративные кустарники и деревья',
-    image: foliageImage.src,
-    href: '/catalog?category=foliage',
-    category: 'foliage' as const,
-    chips: ['Пузыреплодник', 'Спирея', 'Дерен'],
-  },
-  {
-    title: 'Многолетние',
-    description: 'Пионы, хосты, астильбы и другие садовые многолетники',
-    image: perennialsImage.src,
-    href: '/catalog?category=perennials',
-    category: 'perennials' as const,
-    chips: ['Хосты', 'Пионы', 'Лилейники'],
-  },
-]
+export async function Categories() {
+  const payload = await getPayloadClient()
+  const categories = await getHomepageCategoryCards(payload)
 
-export function Categories() {
+  if (categories.length === 0) {
+    return null
+  }
+
   return (
     <section className="py-20 bg-cream-dark">
       <div className="container">
@@ -62,7 +32,7 @@ export function Categories() {
         <div className="grid gap-6 md:grid-cols-2">
           {categories.map((category, index) => (
             <motion.div
-              key={category.title}
+              key={category.id}
               initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.35 }}

@@ -80,6 +80,7 @@ export interface Config {
     'product-variant-types': ProductVariantType;
     'product-variants': ProductVariant;
     'gallery-images': GalleryImage;
+    'homepage-category-cards': HomepageCategoryCard;
     articles: Article;
     'article-authors': ArticleAuthor;
     pages: Page;
@@ -105,6 +106,7 @@ export interface Config {
     'product-variant-types': ProductVariantTypesSelect<false> | ProductVariantTypesSelect<true>;
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
     'gallery-images': GalleryImagesSelect<false> | GalleryImagesSelect<true>;
+    'homepage-category-cards': HomepageCategoryCardsSelect<false> | HomepageCategoryCardsSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-authors': ArticleAuthorsSelect<false> | ArticleAuthorsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -402,6 +404,29 @@ export interface GalleryImage {
   createdAt: string;
 }
 /**
+ * Карточки раздела «Ассортимент — Категории растений» на главной странице.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-category-cards".
+ */
+export interface HomepageCategoryCard {
+  id: number;
+  title: string;
+  description: string;
+  image: number | Media;
+  /**
+   * Определяет раздел каталога, который откроется по клику на карточку.
+   */
+  group: number | ProductGroup;
+  /**
+   * Доступны только роды из выбранной выше группы. Их названия станут чипами.
+   */
+  categories?: (number | ProductCategory)[] | null;
+  sortOrder: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles".
  */
@@ -428,6 +453,7 @@ export interface Article {
   readTimeInMins?: number | null;
   coverImage: number | Media;
   author: number | ArticleAuthor;
+  category: string;
   status: 'Draft' | 'Published';
   publishedAt?: string | null;
   updatedAt: string;
@@ -739,6 +765,10 @@ export interface PayloadLockedDocument {
         value: number | GalleryImage;
       } | null)
     | ({
+        relationTo: 'homepage-category-cards';
+        value: number | HomepageCategoryCard;
+      } | null)
+    | ({
         relationTo: 'articles';
         value: number | Article;
       } | null)
@@ -1047,6 +1077,20 @@ export interface GalleryImagesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage-category-cards_select".
+ */
+export interface HomepageCategoryCardsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  image?: T;
+  group?: T;
+  categories?: T;
+  sortOrder?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "articles_select".
  */
 export interface ArticlesSelect<T extends boolean = true> {
@@ -1057,6 +1101,7 @@ export interface ArticlesSelect<T extends boolean = true> {
   readTimeInMins?: T;
   coverImage?: T;
   author?: T;
+  category?: T;
   status?: T;
   publishedAt?: T;
   updatedAt?: T;

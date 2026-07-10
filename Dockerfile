@@ -3,7 +3,7 @@ FROM node:22.22-slim AS base
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PNPM_HOME=/pnpm
 ENV PATH="${PNPM_HOME}:${PATH}"
-ARG PNPM_VERSION=10.18.3
+ARG PNPM_VERSION=10.34.5
 
 RUN corepack enable && corepack prepare pnpm@${PNPM_VERSION} --activate
 
@@ -12,7 +12,7 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY patches ./patches
-RUN pnpm install --frozen-lockfile
+RUN CI=true pnpm install --frozen-lockfile
 
 FROM base AS builder
 WORKDIR /app

@@ -19,6 +19,7 @@ export async function getArticles() {
         title: true,
         contentSummary: true,
         author: true,
+        category: true,
         coverImage: true,
         status: true,
         readTimeInMins: true,

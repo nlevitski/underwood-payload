@@ -75,6 +75,12 @@ export const Articles: CollectionConfig = {
       required: true,
     },
     {
+      name: 'category',
+      type: 'text',
+      required: true,
+      defaultValue: 'Статья',
+    },
+    {
       name: 'status',
       type: 'select',
       options: Object.values(statusOptions),

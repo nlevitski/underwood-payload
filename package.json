@@ -4,7 +4,7 @@
   "description": "A blank template to get started with Payload 3.0",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@10.18.3",
+  "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "deploy:content": "bash scripts/deploy-content.sh",
@@ -13,6 +13,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
+    "migrate:blog": "tsx -r dotenv/config src/scripts/migrate-static-blog-articles.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "set -a && . ./.env && set +a && exec env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",

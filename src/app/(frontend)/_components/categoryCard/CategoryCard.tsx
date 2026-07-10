@@ -5,33 +5,38 @@ import type { CSSProperties } from 'react'
 
 import { cn } from '@/lib/utils'
 
-type CategoryTone = 'conifers' | 'berries' | 'foliage' | 'perennials'
-
 interface CategoryCardProps {
   title: string
   description: string
   image: string
   href: string
-  category: CategoryTone
+  category: string
   chips: string[]
 }
 
-const toneMap: Record<CategoryTone, string> = {
+const toneMap: Record<string, string> = {
   conifers: 'oklch(28% 0.06 154)',
   berries: 'oklch(45% 0.12 337)',
   foliage: 'oklch(45% 0.105 255)',
   perennials: 'oklch(54% 0.08 72)',
 }
 
-const titleMaxWidthMap: Record<CategoryTone, string> = {
+const titleMaxWidthMap: Record<string, string> = {
   conifers: '8.5ch',
   berries: '8.5ch',
   foliage: '9ch',
   perennials: '10ch',
 }
 
-export function CategoryCard({ title, description, image, href, category, chips }: CategoryCardProps) {
-  const tone = toneMap[category]
+export function CategoryCard({
+  title,
+  description,
+  image,
+  href,
+  category,
+  chips,
+}: CategoryCardProps) {
+  const tone = toneMap[category] ?? 'oklch(36% 0.07 145)'
 
   return (
     <Link
@@ -91,7 +96,7 @@ export function CategoryCard({ title, description, image, href, category, chips 
               'card-title font-sans text-[clamp(30px,4vw,58px)] font-bold leading-[0.98] tracking-[-0.03em] text-balance',
               'max-w-[7.5ch] max-md:max-w-[9ch] max-md:text-[clamp(30px,11vw,44px)]',
             )}
-            style={{ maxWidth: titleMaxWidthMap[category] }}
+            style={{ maxWidth: titleMaxWidthMap[category] ?? '10ch' }}
           >
             {title}
           </h3>

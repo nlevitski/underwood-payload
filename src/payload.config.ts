@@ -23,6 +23,7 @@ import { ArticleAuthors } from './collections/ArticleAuthors/config'
 import { ProductPots } from './collections/ProductPots/config'
 import { ProductItemCares } from './collections/ProductItemCares/config'
 import { GalleryImages } from './collections/GalleryImages/config'
+import { HomepageCategoryCards } from './collections/HomepageCategoryCards/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -71,6 +72,7 @@ export default buildConfig({
     ProductVariantTypes,
     ProductVariants,
     GalleryImages,
+    HomepageCategoryCards,
     Articles,
     ArticleAuthors,
     {
