@@ -76,9 +76,13 @@ export function PlantCard(props: PlantCardProps) {
     setHoveredPotId(hoveredVariant.pots[0]?.id ?? null)
   }
 
-  const clearHoverSelection = () => {
+  const clearVariantHover = () => {
     setHoveredPotId(null)
     setHoveredVariantId(null)
+  }
+
+  const clearPotHover = () => {
+    setHoveredPotId(null)
   }
 
   const handlePotHover = (id: number) => {
@@ -110,10 +114,10 @@ export function PlantCard(props: PlantCardProps) {
           {props.name}
         </h3>
 
-        <div className="relative z-20" onMouseLeave={clearHoverSelection}>
+        <div className="relative z-20">
           {hasVariantSelection && (
             <div className="flex">
-              <div className="min-w-0 flex-[2]">
+              <div className="min-w-0 flex-[2]" onMouseLeave={clearVariantHover}>
                 <p className="text-xs text-muted-foreground mb-1.5 block">{variantLabel}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {props.variants.map((variant) => {
@@ -141,7 +145,10 @@ export function PlantCard(props: PlantCardProps) {
                 </div>
               </div>
 
-              <div className="ml-1 min-w-0 flex-1 border-l border-border pl-1 min-[340px]:ml-2 min-[340px]:pl-2 sm:ml-3 sm:pl-3">
+              <div
+                className="ml-1 min-w-0 flex-1 border-l border-border pl-1 min-[340px]:ml-2 min-[340px]:pl-2 sm:ml-3 sm:pl-3"
+                onMouseLeave={clearPotHover}
+              >
                 <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
                 <div className="flex flex-wrap gap-1.5">
                   {currentVariant.pots.map((pot) => (
@@ -171,7 +178,7 @@ export function PlantCard(props: PlantCardProps) {
           )}
 
           {!hasVariantSelection && (
-            <div>
+            <div onMouseLeave={clearPotHover}>
               <p className="text-xs text-muted-foreground mb-1.5 block">Горшок</p>
               <div className="flex flex-wrap gap-1.5">
                 {allPots.map((pot) => (
