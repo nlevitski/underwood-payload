@@ -19,6 +19,7 @@ type VariantWithValue = {
 type PlantCardProps = DBProduct & {
   initialVariantId?: number
   initialPotId?: number
+  imageLoading?: 'eager' | 'lazy'
 }
 
 function normalizePotCode(value: string) {
@@ -96,6 +97,7 @@ export function PlantCard(props: PlantCardProps) {
           src={currentPot.images?.[0]?.url || props.image}
           alt={props.name}
           fill
+          loading={props.imageLoading ?? 'lazy'}
           sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

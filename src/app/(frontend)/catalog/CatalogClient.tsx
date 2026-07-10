@@ -27,6 +27,7 @@ import {
 
 import { PlantCard } from '../_components/plantCard/PlantCard'
 import type { DBProduct } from './dbProducts'
+import { comparePotCodes } from './productVariantSorting'
 
 const perPageOptions = [12, 24, 48] as const
 
@@ -230,16 +231,7 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
         key,
         label: categoryLabels.get(key) ?? key,
       })),
-      potVolumes: Array.from(pots).sort((left, right) => {
-        const leftValue = Number(left.replace(/[^\d]/g, ''))
-        const rightValue = Number(right.replace(/[^\d]/g, ''))
-
-        if (Number.isNaN(leftValue) || Number.isNaN(rightValue)) {
-          return left.localeCompare(right, 'ru')
-        }
-
-        return leftValue - rightValue || left.localeCompare(right, 'ru')
-      }),
+      potVolumes: Array.from(pots).sort(comparePotCodes),
       minPrice: Number.isFinite(min) ? Math.floor(min) : 0,
       maxPrice: Number.isFinite(max) ? Math.ceil(max) : 0,
     }
@@ -654,7 +646,7 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
                   </div>
 
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-                    {paginatedProducts.map((product) => {
+                    {paginatedProducts.map((product, index) => {
                       const displayProduct = getDisplayProduct(product)
 
                       return (
@@ -662,6 +654,7 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
                           key={`${product.slug}-${selectedPots.join(',')}-${appliedPriceRange.join('-')}-${inStockOnly}`}
                           {...displayProduct}
                           {...getInitialSelection(displayProduct)}
+                          imageLoading={index < 3 ? 'eager' : 'lazy'}
                         />
                       )
                     })}

@@ -22,6 +22,7 @@ import { env, getEmailEnvIfConfigured } from './lib/env'
 import { ArticleAuthors } from './collections/ArticleAuthors/config'
 import { ProductPots } from './collections/ProductPots/config'
 import { ProductItemCares } from './collections/ProductItemCares/config'
+import { GalleryImages } from './collections/GalleryImages/config'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -69,6 +70,7 @@ export default buildConfig({
     ProductPots,
     ProductVariantTypes,
     ProductVariants,
+    GalleryImages,
     Articles,
     ArticleAuthors,
     {

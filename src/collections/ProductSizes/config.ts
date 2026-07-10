@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-import { sizeTypes } from './constants'
 
 export const ProductSizes: CollectionConfig = {
   slug: 'product-sizes',
@@ -10,11 +9,13 @@ export const ProductSizes: CollectionConfig = {
   fields: [
     {
       name: 'label',
-      type: 'select',
+      type: 'text',
       required: true,
       unique: true,
       index: true,
-      options: [...sizeTypes],
+      hooks: {
+        beforeValidate: [({ value }) => (typeof value === 'string' ? value.trim() : value)],
+      },
     },
   ],
 }

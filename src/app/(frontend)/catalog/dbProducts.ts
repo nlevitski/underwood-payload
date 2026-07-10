@@ -13,6 +13,7 @@ import type {
 import type { Payload } from 'payload'
 
 import type { Care, CategoryKey, Product, ProductAttributes } from './products'
+import { comparePotCodes, getSizeLowerBound } from './productVariantSorting'
 
 type DBProductImageSize = {
   url: string
@@ -76,19 +77,7 @@ const categoryLabelsByKey = {
   perennials: 'Многолетние',
 } as const satisfies Record<CategoryKey, Product['category']>
 
-const sizeValues = [
-  '25-40',
-  '35-50',
-  '40-60',
-  '50-60',
-  '60-70',
-  '70-80',
-  '80',
-  '80-90',
-  '90-120',
-] as const
 const categoryOrder = Object.keys(categoryLabelsByKey)
-const sizeOrder = new Map(sizeValues.map((size, index) => [size, index]))
 const ripeningTimeLabels = {
   early: 'Ранний',
   earlyMid: 'Ранний-средний',
@@ -293,7 +282,7 @@ function resolveVariantValue(variant: PayloadProductVariant) {
     return {
       value: variant.size.label,
       postfix: 'см',
-      sortValue: sizeOrder.get(variant.size.label) ?? Number.MAX_SAFE_INTEGER,
+      sortValue: getSizeLowerBound(variant.size.label),
     }
   }
 
@@ -311,34 +300,24 @@ function resolveVariantValue(variant: PayloadProductVariant) {
 }
 
 function comparePots(left: DBProductPot, right: DBProductPot) {
-  const leftValue = Number(left.name.replace(/[^\d]/g, ''))
-  const rightValue = Number(right.name.replace(/[^\d]/g, ''))
-
-  if (Number.isNaN(leftValue) || Number.isNaN(rightValue)) {
-    return left.name.localeCompare(right.name, 'ru')
-  }
-
-  return leftValue - rightValue || left.name.localeCompare(right.name, 'ru')
+  return comparePotCodes(left.name, right.name)
 }
 
 function normalizeVariants(variants: PayloadProductVariant[]): DBProductVariant[] {
   const variantType = variants[0]?.variantType ?? 'none'
 
   if (variantType === 'none') {
-    return variants.flatMap((variant, index) => {
-      const pot = normalizePot(variant)
+    return variants
+      .flatMap((variant) => {
+        const pot = normalizePot(variant)
 
-      if (!pot) {
-        return []
-      }
-
-      return [
-        {
-          id: index + 1,
-          pots: [pot],
-        },
-      ]
-    })
+        return pot ? [pot] : []
+      })
+      .sort(comparePots)
+      .map((pot, index) => ({
+        id: index + 1,
+        pots: [pot],
+      }))
   }
 
   const variantsByValue = new Map<
@@ -375,7 +354,8 @@ function normalizeVariants(variants: PayloadProductVariant[]): DBProductVariant[
   return Array.from(variantsByValue.values())
     .sort(
       (left, right) =>
-        left.sortValue - right.sortValue || left.value.localeCompare(right.value, 'ru'),
+        left.sortValue - right.sortValue ||
+        left.value.localeCompare(right.value, 'ru', { numeric: true }),
     )
     .flatMap((group, index) => {
       const pots = group.variants.flatMap((variant) => {

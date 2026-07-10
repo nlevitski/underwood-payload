@@ -1,4 +1,5 @@
-export const sizeTypes = [
+export const defaultProductSizes = [
+  '20-30',
   '25-40',
   '35-50',
   '40-60',

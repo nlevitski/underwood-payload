@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { syncVariantSkusOnItemSlugChangeHook } from './hooks/sync-variant-skus.hook'
 
 export const ProductItems: CollectionConfig = {
   slug: 'product-items',
@@ -42,4 +43,7 @@ export const ProductItems: CollectionConfig = {
       relationTo: 'product-item-cares',
     },
   ],
+  hooks: {
+    afterChange: [syncVariantSkusOnItemSlugChangeHook],
+  },
 }

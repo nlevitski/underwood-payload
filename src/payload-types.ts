@@ -79,6 +79,7 @@ export interface Config {
     'product-pots': ProductPot;
     'product-variant-types': ProductVariantType;
     'product-variants': ProductVariant;
+    'gallery-images': GalleryImage;
     articles: Article;
     'article-authors': ArticleAuthor;
     pages: Page;
@@ -103,6 +104,7 @@ export interface Config {
     'product-pots': ProductPotsSelect<false> | ProductPotsSelect<true>;
     'product-variant-types': ProductVariantTypesSelect<false> | ProductVariantTypesSelect<true>;
     'product-variants': ProductVariantsSelect<false> | ProductVariantsSelect<true>;
+    'gallery-images': GalleryImagesSelect<false> | GalleryImagesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     'article-authors': ArticleAuthorsSelect<false> | ArticleAuthorsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
@@ -324,7 +326,7 @@ export interface ProductItemCare {
  */
 export interface ProductSize {
   id: number;
-  label: '25-40' | '35-50' | '40-60' | '50-60' | '60-70' | '70-80' | '80' | '80-90' | '90-120';
+  label: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -385,6 +387,17 @@ export interface ProductVariant {
   stockQty: number;
   isAvailable: boolean;
   Image?: (number | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-images".
+ */
+export interface GalleryImage {
+  id: number;
+  image: number | Media;
+  sortOrder: number;
   updatedAt: string;
   createdAt: string;
 }
@@ -722,6 +735,10 @@ export interface PayloadLockedDocument {
         value: number | ProductVariant;
       } | null)
     | ({
+        relationTo: 'gallery-images';
+        value: number | GalleryImage;
+      } | null)
+    | ({
         relationTo: 'articles';
         value: number | Article;
       } | null)
@@ -1015,6 +1032,16 @@ export interface ProductVariantsSelect<T extends boolean = true> {
   stockQty?: T;
   isAvailable?: T;
   Image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery-images_select".
+ */
+export interface GalleryImagesSelect<T extends boolean = true> {
+  image?: T;
+  sortOrder?: T;
   updatedAt?: T;
   createdAt?: T;
 }

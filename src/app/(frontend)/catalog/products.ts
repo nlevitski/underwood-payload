@@ -29,18 +29,7 @@ export type ValueType = (typeof valueTypes)[number]
 export const ageTypes = ['1', '2', '3', '4', '5'] as const
 export type AgeType = (typeof ageTypes)[number]
 
-export const sizeTypes = [
-  '25-40',
-  '35-50',
-  '40-60',
-  '50-60',
-  '60-70',
-  '70-80',
-  '80',
-  '80-90',
-  '90-120',
-] as const
-export type SizeType = (typeof sizeTypes)[number]
+export type SizeType = string
 
 export const agePostfixes = ['год', 'года', 'лет'] as const
 export type AgePostfix = (typeof agePostfixes)[number]
