@@ -32,6 +32,7 @@ export type AgeType = (typeof ageTypes)[number]
 export const sizeTypes = [
   '25-40',
   '35-50',
+  '40-60',
   '50-60',
   '60-70',
   '70-80',

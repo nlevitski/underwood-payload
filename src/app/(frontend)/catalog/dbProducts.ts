@@ -76,7 +76,17 @@ const categoryLabelsByKey = {
   perennials: 'Многолетние',
 } as const satisfies Record<CategoryKey, Product['category']>
 
-const sizeValues = ['25-40', '35-50', '50-60', '60-70', '70-80', '80', '80-90', '90-120'] as const
+const sizeValues = [
+  '25-40',
+  '35-50',
+  '40-60',
+  '50-60',
+  '60-70',
+  '70-80',
+  '80',
+  '80-90',
+  '90-120',
+] as const
 const categoryOrder = Object.keys(categoryLabelsByKey)
 const sizeOrder = new Map(sizeValues.map((size, index) => [size, index]))
 const ripeningTimeLabels = {
