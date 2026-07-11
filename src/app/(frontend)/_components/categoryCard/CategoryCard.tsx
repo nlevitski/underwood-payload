@@ -9,6 +9,7 @@ interface CategoryCardProps {
   title: string
   description: string
   image: string
+  blurDataUrl?: string
   href: string
   category: string
   chips: string[]
@@ -32,6 +33,7 @@ export function CategoryCard({
   title,
   description,
   image,
+  blurDataUrl,
   href,
   category,
   chips,
@@ -59,6 +61,8 @@ export function CategoryCard({
           src={image}
           alt={title}
           fill
+          placeholder={blurDataUrl ? 'blur' : 'empty'}
+          blurDataURL={blurDataUrl}
           className="object-cover [filter:saturate(0.96)_contrast(1.02)] transition-transform duration-[420ms] ease-out group-hover:scale-[1.045] group-focus-visible:scale-[1.045]"
           sizes="(max-width: 760px) 100vw, 50vw"
         />

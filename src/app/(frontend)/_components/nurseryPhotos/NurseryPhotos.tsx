@@ -37,6 +37,8 @@ export async function NurseryPhotos() {
                   src={previewImage.src}
                   alt={previewImage.alt}
                   fill
+                  placeholder={previewImage.blurDataUrl ? 'blur' : 'empty'}
+                  blurDataURL={previewImage.blurDataUrl}
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="100vw"
                 />

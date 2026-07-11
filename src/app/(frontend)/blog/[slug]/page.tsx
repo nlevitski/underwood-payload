@@ -107,6 +107,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   src={post.image}
                   alt={post.title}
                   fill
+                  placeholder={post.blurDataUrl ? 'blur' : 'empty'}
+                  blurDataURL={post.blurDataUrl}
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 768px"
                 />
@@ -176,6 +178,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   title={p.title}
                   excerpt={p.excerpt}
                   image={p.image}
+                  blurDataUrl={p.blurDataUrl}
                   date={p.date}
                   category={p.category}
                 />

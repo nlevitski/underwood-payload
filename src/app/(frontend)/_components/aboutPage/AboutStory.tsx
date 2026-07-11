@@ -1,9 +1,15 @@
 import * as motion from 'motion/react-client'
 import Image from 'next/image'
+import { getMediaImageByFilename } from '@/collections/Media/fetchers'
+import { getPayloadClient } from '@/lib/payload/client'
 
-const nurseryImageSrc = '/api/media/file/nursery_perspective_IMG_4676.webp'
+const nurseryImageFilename = 'nursery_perspective_IMG_4676.webp'
+const nurseryImageSrc = `/api/media/file/${nurseryImageFilename}`
 
-export function AboutStory() {
+export async function AboutStory() {
+  const payload = await getPayloadClient()
+  const nurseryImage = await getMediaImageByFilename(payload, nurseryImageFilename)
+
   return (
     <section className="py-20">
       <div className="container">
@@ -44,9 +50,11 @@ export function AboutStory() {
           >
             <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-elevated">
               <Image
-                src={nurseryImageSrc}
+                src={nurseryImage?.src ?? nurseryImageSrc}
                 alt="Общий вид питомника Underwood"
                 fill
+                placeholder={nurseryImage?.blurDataUrl ? 'blur' : 'empty'}
+                blurDataURL={nurseryImage?.blurDataUrl}
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />

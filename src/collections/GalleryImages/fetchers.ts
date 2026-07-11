@@ -6,6 +6,7 @@ export type GalleryImageViewModel = {
   id: number
   src: string
   alt: string
+  blurDataUrl?: string
   width: number
   height: number
 }
@@ -33,6 +34,7 @@ export async function getGalleryImages(payload: Payload): Promise<GalleryImageVi
         id,
         src: image.url,
         alt: image.alt,
+        blurDataUrl: image.blurDataUrl ?? undefined,
         width: image.width,
         height: image.height,
       },

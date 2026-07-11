@@ -3,10 +3,16 @@ import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
+import { getMediaImageByFilename } from '@/collections/Media/fetchers'
+import { getPayloadClient } from '@/lib/payload/client'
 
-const nurseryImageSrc = '/api/media/file/nursery_perspective_IMG_4676.webp'
+const nurseryImageFilename = 'nursery_perspective_IMG_4676.webp'
+const nurseryImageSrc = `/api/media/file/${nurseryImageFilename}`
 
-export function About() {
+export async function About() {
+  const payload = await getPayloadClient()
+  const nurseryImage = await getMediaImageByFilename(payload, nurseryImageFilename)
+
   return (
     <section className="py-20">
       <div className="container">
@@ -50,9 +56,11 @@ export function About() {
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl shadow-elevated">
               <Image
-                src={nurseryImageSrc}
+                src={nurseryImage?.src ?? nurseryImageSrc}
                 alt="Общий вид питомника Underwood"
                 fill
+                placeholder={nurseryImage?.blurDataUrl ? 'blur' : 'empty'}
+                blurDataURL={nurseryImage?.blurDataUrl}
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />

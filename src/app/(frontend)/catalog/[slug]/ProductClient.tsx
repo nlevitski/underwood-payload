@@ -46,6 +46,8 @@ export function ProductClient({ product }: { product: DBProduct }) {
     return null
   }
 
+  const currentImage = currentPot.images?.[0]
+
   const toggleVariant = (id: number) => {
     const nextVariant = product.variants.find((variant) => variant.id === id)
     if (!nextVariant) return
@@ -83,9 +85,11 @@ export function ProductClient({ product }: { product: DBProduct }) {
       >
         <div className="aspect-square rounded-2xl overflow-hidden shadow-elevated relative">
           <Image
-            src={currentPot.images?.[0]?.url || product.image}
+            src={currentImage?.url || product.image}
             alt={product.name}
             fill
+            placeholder={currentImage?.blurDataUrl ? 'blur' : 'empty'}
+            blurDataURL={currentImage?.blurDataUrl || undefined}
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="object-cover"
             priority

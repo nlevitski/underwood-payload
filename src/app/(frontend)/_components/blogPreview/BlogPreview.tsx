@@ -36,6 +36,7 @@ export async function BlogPreview() {
               title={post.title}
               excerpt={post.excerpt}
               image={post.image}
+              blurDataUrl={post.blurDataUrl}
               date={post.date}
               category={post.category}
             />

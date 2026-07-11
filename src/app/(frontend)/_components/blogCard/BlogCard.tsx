@@ -7,11 +7,20 @@ interface BlogCardProps {
   title: string
   excerpt: string
   image: string
+  blurDataUrl?: string
   date: string
   category: string
 }
 
-export function BlogCard({ id, title, excerpt, image, date, category }: BlogCardProps) {
+export function BlogCard({
+  id,
+  title,
+  excerpt,
+  image,
+  blurDataUrl,
+  date,
+  category,
+}: BlogCardProps) {
   return (
     <article className="h-full">
       <Link
@@ -24,6 +33,8 @@ export function BlogCard({ id, title, excerpt, image, date, category }: BlogCard
               src={image}
               alt={title}
               fill
+              placeholder={blurDataUrl ? 'blur' : 'empty'}
+              blurDataURL={blurDataUrl}
               className="object-cover transition-transform duration-500 group-hover:scale-105"
               sizes="(max-width: 768px) 100vw, 33vw"
             />

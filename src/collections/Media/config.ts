@@ -5,6 +5,7 @@ import fs from 'fs/promises'
 import path from 'path'
 
 import { configureMediaImageSizesHook } from './hooks/configure-image-sizes.hook'
+import { generateBlurDataUrlHook } from './hooks/generate-blur-data-url.hook'
 import { createMediaImageSizes } from './image-sizes'
 
 export const Media: CollectionConfig = {
@@ -18,6 +19,11 @@ export const Media: CollectionConfig = {
 
   fields: [
     { name: 'alt', type: 'text', required: true },
+    {
+      name: 'blurDataUrl',
+      type: 'text',
+      admin: { hidden: true },
+    },
     {
       name: 'cropToSquare',
       type: 'checkbox',
@@ -63,6 +69,8 @@ export const Media: CollectionConfig = {
         }
       },
     ],
+
+    beforeChange: [generateBlurDataUrlHook],
 
     afterChange: [
       async ({ collection, doc, previousDoc, req, operation, context }) => {

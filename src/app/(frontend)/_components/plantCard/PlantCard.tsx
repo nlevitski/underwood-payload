@@ -57,6 +57,8 @@ export function PlantCard(props: PlantCardProps) {
     return null
   }
 
+  const currentImage = currentPot.images?.[0]
+
   const toggleVariant = (id: number) => {
     const nextVariant = props.variants.find((variant) => variant.id === id)
     if (!nextVariant) return
@@ -98,10 +100,12 @@ export function PlantCard(props: PlantCardProps) {
       />
       <div className="aspect-square overflow-hidden relative">
         <Image
-          src={currentPot.images?.[0]?.url || props.image}
+          src={currentImage?.url || props.image}
           alt={props.name}
           fill
           loading={props.imageLoading ?? 'lazy'}
+          placeholder={currentImage?.blurDataUrl ? 'blur' : 'empty'}
+          blurDataURL={currentImage?.blurDataUrl || undefined}
           sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />

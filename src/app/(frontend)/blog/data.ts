@@ -8,6 +8,7 @@ export interface BlogPost {
   title: string
   excerpt: string
   image: string
+  blurDataUrl?: string
   date: string
   category: string
   author: string
@@ -54,6 +55,10 @@ function resolveMediaUrl(media: Relation<Media>, fallback: string) {
     media.sizes?.xs?.url ??
     fallback
   )
+}
+
+function resolveMediaBlurDataUrl(media: Relation<Media>) {
+  return isObjectRelation<Media>(media) ? (media.blurDataUrl ?? undefined) : undefined
 }
 
 function resolveAuthorName(author: Relation<ArticleAuthor>) {
@@ -116,6 +121,7 @@ function normalizeArticleCard(article: Article): BlogPost {
     title: article.title,
     excerpt: removeLeadingTitleFromSummary(article.contentSummary, article.title),
     image: resolveMediaUrl(article.coverImage, thujaImage.src),
+    blurDataUrl: resolveMediaBlurDataUrl(article.coverImage),
     date: formatDate(article.publishedAt ?? article.createdAt),
     category: article.category,
     author: resolveAuthorName(article.author),

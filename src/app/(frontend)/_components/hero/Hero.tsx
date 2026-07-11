@@ -5,8 +5,11 @@ import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import * as motion from 'motion/react-client'
 import { cn } from '@/lib/utils'
+import { getMediaImageByFilename } from '@/collections/Media/fetchers'
+import { getPayloadClient } from '@/lib/payload/client'
 
-const heroImageSrc = '/api/media/file/nursery_perspective_IMG_4682.webp'
+const heroImageFilename = 'nursery_perspective_IMG_4682.webp'
+const heroImageSrc = `/api/media/file/${heroImageFilename}`
 
 type HeroProps = {
   title?: ReactNode
@@ -16,6 +19,7 @@ type HeroProps = {
   actions?: ReactNode
   imageSrc?: string
   imageAlt?: string
+  blurDataUrl?: string
   heightClassName?: string
   containerPaddingClassName?: string
   contentClassName?: string
@@ -23,7 +27,7 @@ type HeroProps = {
   titleClassName?: string
 }
 
-export function Hero({
+export async function Hero({
   title = 'Underwood',
   subtitle = 'Питомник хвойных и ягодных растений',
   description = (
@@ -36,12 +40,19 @@ export function Hero({
   actions,
   imageSrc = heroImageSrc,
   imageAlt = 'Питомник Underwood',
+  blurDataUrl,
   heightClassName = 'min-h-[85vh]',
   containerPaddingClassName = 'py-20',
   contentClassName = 'max-w-2xl',
   overlayClassName = 'bg-gradient-to-r from-foreground/70 via-foreground/50 to-transparent',
   titleClassName = 'text-4xl md:text-5xl lg:text-6xl',
 }: HeroProps) {
+  const payload = await getPayloadClient()
+  const defaultImage =
+    imageSrc === heroImageSrc ? await getMediaImageByFilename(payload, heroImageFilename) : null
+  const resolvedImageSrc = defaultImage?.src ?? imageSrc
+  const resolvedBlurDataUrl = blurDataUrl ?? defaultImage?.blurDataUrl
+
   const defaultActions = (
     <>
       <Button variant="default" asChild>
@@ -63,7 +74,15 @@ export function Hero({
   return (
     <section className={cn('relative flex items-center', heightClassName)}>
       <div className="absolute inset-0">
-        <Image src={imageSrc} alt={imageAlt} fill className="object-cover" priority />
+        <Image
+          src={resolvedImageSrc}
+          alt={imageAlt}
+          fill
+          placeholder={resolvedBlurDataUrl ? 'blur' : 'empty'}
+          blurDataURL={resolvedBlurDataUrl}
+          className="object-cover"
+          priority
+        />
         <div className={cn('absolute inset-0', overlayClassName)} />
       </div>
       <div className={cn('container relative z-10', containerPaddingClassName)}>

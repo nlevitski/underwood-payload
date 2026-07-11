@@ -29,9 +29,7 @@ export default async function GalleryPage() {
             <span className="text-foreground">Фото питомника</span>
           </nav>
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">Фото питомника</h1>
-          <p className="mt-2 text-muted-foreground">
-            Реальные фотографии наших полей и растений
-          </p>
+          <p className="mt-2 text-muted-foreground">Реальные фотографии наших полей и растений</p>
         </div>
       </section>
 
@@ -54,6 +52,8 @@ export default async function GalleryPage() {
                       src={image.src}
                       alt={image.alt}
                       fill
+                      placeholder={image.blurDataUrl ? 'blur' : 'empty'}
+                      blurDataURL={image.blurDataUrl}
                       className="object-cover transition-transform duration-500 hover:scale-105"
                       sizes={
                         index === 0
@@ -66,9 +66,7 @@ export default async function GalleryPage() {
               ))}
             </div>
           ) : (
-            <p className="py-12 text-center text-muted-foreground">
-              Фотографии скоро появятся.
-            </p>
+            <p className="py-12 text-center text-muted-foreground">Фотографии скоро появятся.</p>
           )}
         </div>
       </section>

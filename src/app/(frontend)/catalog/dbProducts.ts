@@ -238,7 +238,7 @@ function normalizeMediaImage(relation: Relation<Media>): DBProductImage[] {
     {
       id: relation.id,
       alt: relation.alt,
-      blurDataUrl: '',
+      blurDataUrl: relation.blurDataUrl ?? '',
       updatedAt: relation.updatedAt,
       createdAt: relation.createdAt,
       url,

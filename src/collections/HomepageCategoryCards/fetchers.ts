@@ -7,6 +7,7 @@ export type HomepageCategoryCardViewModel = {
   title: string
   description: string
   image: string
+  blurDataUrl?: string
   href: string
   category: string
   chips: string[]
@@ -46,6 +47,7 @@ export async function getHomepageCategoryCards(
         title,
         description,
         image: image.url,
+        blurDataUrl: image.blurDataUrl ?? undefined,
         href: `/catalog?category=${encodeURIComponent(group.slug)}`,
         category: group.slug,
         chips,
