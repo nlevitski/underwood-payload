@@ -1,10 +1,10 @@
 'use client'
 
 import { ArrowRight } from 'lucide-react'
-import Image from 'next/image'
 import { useState } from 'react'
 import Link from 'next/link'
 import type { DBProduct } from '../../catalog/dbProducts'
+import { ProductImageSlider } from '../productImageSlider/ProductImageSlider'
 
 const valueMap = {
   size: 'Размер',
@@ -57,8 +57,6 @@ export function PlantCard(props: PlantCardProps) {
     return null
   }
 
-  const currentImage = currentPot.images?.[0]
-
   const toggleVariant = (id: number) => {
     const nextVariant = props.variants.find((variant) => variant.id === id)
     if (!nextVariant) return
@@ -98,16 +96,15 @@ export function PlantCard(props: PlantCardProps) {
         aria-label={`Открыть страницу товара ${props.name}`}
         className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
       />
-      <div className="aspect-square overflow-hidden relative">
-        <Image
-          src={currentImage?.url || props.image}
-          alt={props.name}
-          fill
-          loading={props.imageLoading ?? 'lazy'}
-          placeholder={currentImage?.blurDataUrl ? 'blur' : 'empty'}
-          blurDataURL={currentImage?.blurDataUrl || undefined}
+      <div className="relative z-20 aspect-square overflow-hidden">
+        <ProductImageSlider
+          images={currentPot.images}
+          fallbackImage={props.image}
+          productName={props.name}
+          imageLoading={props.imageLoading}
           sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          compact
+          href={`/catalog/${props.slug}`}
         />
       </div>
       <div className="flex flex-1 flex-col p-3 space-y-2.5">

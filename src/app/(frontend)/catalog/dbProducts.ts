@@ -219,9 +219,7 @@ function normalizeImageSizes(media: Media): DBProductImage['sizes'] {
 }
 
 function normalizeMediaImage(relation: Relation<Media>): DBProductImage[] {
-  if (!isObjectRelation<Media>(relation)) {
-    return []
-  }
+  if (!isObjectRelation<Media>(relation)) return []
 
   const url =
     relation.url ??
@@ -255,6 +253,12 @@ function normalizeMediaImage(relation: Relation<Media>): DBProductImage[] {
   ]
 }
 
+function normalizeMediaImages(relations: PayloadProductVariant['Image']): DBProductImage[] {
+  if (!relations) return []
+
+  return (Array.isArray(relations) ? relations : [relations]).flatMap(normalizeMediaImage)
+}
+
 function normalizePot(variant: PayloadProductVariant): DBProductPot | null {
   if (!isObjectRelation<PayloadProductPot>(variant.pot)) {
     return null
@@ -265,7 +269,7 @@ function normalizePot(variant: PayloadProductVariant): DBProductPot | null {
     name: variant.pot.code,
     price: variant.price,
     inStock: variant.isAvailable,
-    images: normalizeMediaImage(variant.Image),
+    images: normalizeMediaImages(variant.Image),
   }
 }
 

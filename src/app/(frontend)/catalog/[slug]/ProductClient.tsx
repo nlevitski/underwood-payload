@@ -1,12 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { DBProduct } from '../dbProducts'
+import { ProductImageSlider } from '../../_components/productImageSlider/ProductImageSlider'
 
 type VariantWithValue = {
   value: string
@@ -46,8 +46,6 @@ export function ProductClient({ product }: { product: DBProduct }) {
     return null
   }
 
-  const currentImage = currentPot.images?.[0]
-
   const toggleVariant = (id: number) => {
     const nextVariant = product.variants.find((variant) => variant.id === id)
     if (!nextVariant) return
@@ -84,14 +82,11 @@ export function ProductClient({ product }: { product: DBProduct }) {
         transition={{ duration: 0.5 }}
       >
         <div className="aspect-square rounded-2xl overflow-hidden shadow-elevated relative">
-          <Image
-            src={currentImage?.url || product.image}
-            alt={product.name}
-            fill
-            placeholder={currentImage?.blurDataUrl ? 'blur' : 'empty'}
-            blurDataURL={currentImage?.blurDataUrl || undefined}
+          <ProductImageSlider
+            images={currentPot.images}
+            fallbackImage={product.image}
+            productName={product.name}
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover"
             priority
           />
         </div>

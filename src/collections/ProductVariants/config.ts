@@ -135,15 +135,19 @@ export const ProductVariants: CollectionConfig = {
     },
     {
       name: 'Image',
+      label: 'Фотографии вариации',
       type: 'upload',
       relationTo: 'media',
+      hasMany: true,
       filterOptions: {
-        mimeType: { 
-          contains: 'image' 
+        mimeType: {
+          contains: 'image',
         },
       },
-
-    }
+      admin: {
+        description: 'Порядок файлов определяет порядок фотографий в слайдере на сайте.',
+      },
+    },
   ],
   hooks: {
     beforeValidate: [syncCategoryHook, syncVariantSelectionHook, generateSkuHook],

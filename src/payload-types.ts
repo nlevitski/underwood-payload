@@ -391,7 +391,10 @@ export interface ProductVariant {
   price: number;
   stockQty: number;
   isAvailable: boolean;
-  Image?: (number | null) | Media;
+  /**
+   * Порядок файлов определяет порядок фотографий в слайдере на сайте.
+   */
+  Image?: (number | Media)[] | null;
   updatedAt: string;
   createdAt: string;
 }
