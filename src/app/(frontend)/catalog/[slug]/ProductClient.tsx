@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import * as motion from 'motion/react-client'
 import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { DBProduct } from '../dbProducts'
@@ -28,19 +27,11 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
   const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
   const [potId, setPotId] = useState<number>(initialPot?.id ?? 0)
 
-  // Hover states
-  const [hoveredPotId, setHoveredPotId] = useState<number | null>(null)
-  const [hoveredVariantId, setHoveredVariantId] = useState<number | null>(null)
-
-  // Use hovered values if hovering, otherwise use selected values
-  const displayPotId = hoveredPotId ?? potId
-  const displayVariantId = hoveredVariantId ?? variantId
-
   const currentVariant =
-    product.variants.find((variant) => variant.id === displayVariantId) ?? initialVariant
+    product.variants.find((variant) => variant.id === variantId) ?? initialVariant
   const currentPot = hasVariantSelection
-    ? (currentVariant?.pots.find((pot) => pot.id === displayPotId) ?? currentVariant?.pots[0])
-    : (allPots.find((pot) => pot.id === displayPotId) ?? allPots[0])
+    ? (currentVariant?.pots.find((pot) => pot.id === potId) ?? currentVariant?.pots[0])
+    : (allPots.find((pot) => pot.id === potId) ?? allPots[0])
 
   if (!currentVariant || !currentPot) {
     return null
@@ -52,35 +43,12 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
 
     setVariantId(nextVariant.id)
     setPotId(nextVariant.pots[0]?.id ?? 0)
-    setHoveredPotId(null)
-    setHoveredVariantId(null)
-  }
-
-  const handleVariantHover = (id: number) => {
-    const hoveredVariant = product.variants.find((variant) => variant.id === id)
-    if (!hoveredVariant) return
-
-    setHoveredVariantId(id)
-    setHoveredPotId(hoveredVariant.pots[0]?.id ?? null)
-  }
-
-  const clearHoverSelection = () => {
-    setHoveredPotId(null)
-    setHoveredVariantId(null)
-  }
-
-  const handlePotHover = (id: number) => {
-    setHoveredPotId(id)
   }
 
   return (
     <div className="grid lg:grid-cols-2 gap-12">
       {/* Image */}
-      <motion.div
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
+      <div>
         <div className="aspect-square rounded-2xl overflow-hidden shadow-elevated relative">
           <ProductImageSlider
             images={currentPot.images}
@@ -90,15 +58,10 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
             priority
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Info */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6"
-      >
+      <div className="space-y-6">
         <div>
           <span className="text-sm font-medium text-forest uppercase tracking-wide">
             {product.category}
@@ -108,7 +71,7 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
 
         <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-        <div onMouseLeave={clearHoverSelection}>
+        <div>
           {hasVariantSelection && (
             <div>
               <span className="text-sm font-medium text-foreground mb-2 block">{variantLabel}</span>
@@ -123,7 +86,6 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
                       onClick={() => {
                         toggleVariant(variant.id)
                       }}
-                      onMouseEnter={() => handleVariantHover(variant.id)}
                       aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         variant.id === variantId
@@ -148,16 +110,12 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
                   type="button"
                   onClick={() => {
                     setPotId(pot.id)
-                    setHoveredPotId(null)
                   }}
-                  onMouseEnter={() => handlePotHover(pot.id)}
                   aria-label={pot.name}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                    hoveredPotId === pot.id
-                      ? 'bg-accent text-accent-foreground'
-                      : pot.id === potId
-                        ? 'bg-forest text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-accent'
+                    pot.id === potId
+                      ? 'bg-forest text-primary-foreground'
+                      : 'bg-muted text-muted-foreground hover:bg-accent'
                   }`}
                 >
                   {pot.name}
@@ -193,7 +151,7 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
             <a href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a>
           </Button>
         </div>
-      </motion.div>
+      </div>
     </div>
   )
 }

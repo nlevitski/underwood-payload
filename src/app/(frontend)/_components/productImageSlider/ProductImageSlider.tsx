@@ -48,7 +48,15 @@ export function ProductImageSlider({
   useEffect(() => {
     setLockedIndex(0)
     setVisibleIndex(0)
-    swiperRef.current?.slideTo(0, 0)
+
+    const swiper = swiperRef.current
+    if (!swiper || swiper.destroyed) return
+
+    requestAnimationFrame(() => {
+      if (swiper.destroyed) return
+      swiper.update()
+      swiper.slideTo(0, 0, false)
+    })
   }, [slideKey])
 
   const preview = (index: number) => {
@@ -65,7 +73,7 @@ export function ProductImageSlider({
 
   return (
     <div
-      className="relative h-full w-full"
+      className="relative h-full w-full [overflow-anchor:none]"
       onMouseLeave={slides.length > 1 ? restoreLockedSlide : undefined}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) restoreLockedSlide()
@@ -81,8 +89,13 @@ export function ProductImageSlider({
         resistanceRatio={0.65}
         grabCursor={slides.length > 1}
         allowTouchMove={slides.length > 1}
+        observer
+        observeParents
+        observeSlideChildren
+        resizeObserver
         onSwiper={(swiper) => {
           swiperRef.current = swiper
+          requestAnimationFrame(() => swiper.update())
         }}
         onSlideChange={(swiper) => setVisibleIndex(swiper.activeIndex)}
         onTouchEnd={(swiper) => {
