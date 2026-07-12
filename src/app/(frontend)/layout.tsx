@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   }
 
   return (
-    <html lang="ru" suppressHydrationWarning>
+    <html lang="ru" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col antialiased">
         <JsonLd data={localBusinessJsonLd} />
         <ThemeProvider

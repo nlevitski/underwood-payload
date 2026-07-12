@@ -96,7 +96,7 @@ export function PlantCard(props: PlantCardProps) {
         aria-label={`Открыть страницу товара ${props.name}`}
         className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
       />
-      <div className="relative z-20 aspect-square overflow-hidden">
+      <div className="relative z-20 w-full min-w-0 aspect-square overflow-hidden">
         <ProductImageSlider
           images={currentPot.images}
           fallbackImage={props.image}

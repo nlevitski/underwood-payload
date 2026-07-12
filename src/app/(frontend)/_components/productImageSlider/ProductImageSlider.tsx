@@ -73,7 +73,7 @@ export function ProductImageSlider({
 
   return (
     <div
-      className="relative h-full w-full [overflow-anchor:none]"
+      className="absolute inset-0 min-h-0 min-w-0 [overflow-anchor:none]"
       onMouseLeave={slides.length > 1 ? restoreLockedSlide : undefined}
       onBlur={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget)) restoreLockedSlide()
@@ -106,10 +106,10 @@ export function ProductImageSlider({
           containerMessage: `Фотографии товара ${productName}`,
           slideLabelMessage: '{{index}} из {{slidesLength}}',
         }}
-        className="h-full w-full"
+        className="h-full w-full min-h-0 min-w-0"
       >
         {slides.map((image, index) => (
-          <SwiperSlide key={image.id}>
+          <SwiperSlide key={image.id} className="min-h-0 min-w-0">
             <Image
               src={image.url}
               alt={image.alt?.trim() || `${productName}, фото ${index + 1}`}
