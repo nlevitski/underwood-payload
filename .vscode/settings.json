@@ -1,5 +1,6 @@
 {
   "npm.packageManager": "pnpm",
+  "npm.scriptRunner": "node",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",

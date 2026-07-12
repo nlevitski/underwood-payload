@@ -3,8 +3,9 @@ import { LogoIcon } from '@/components/icons/Logo'
 import { MapPinIcon } from '@/components/icons/MapPin'
 import { PhoneIcon } from '@/components/icons/Phone'
 import Link from 'next/link'
+import type { SiteSettingsData } from '@/globals/fetchers'
 
-export function Footer() {
+export function Footer({ settings }: { settings: SiteSettingsData }) {
   return (
     <footer className="border-t border-border bg-cream-dark">
       <div className="container py-12 md:py-16">
@@ -13,7 +14,9 @@ export function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center gap-2.5">
               <LogoIcon />
-              <span className="text-xl font-bold tracking-tight text-foreground">Underwood</span>
+              <span className="text-xl font-bold tracking-tight text-foreground">
+                {settings.siteName}
+              </span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Питомник растений в Беларуси. Выращиваем хвойные и ягодные культуры с заботой и
@@ -23,7 +26,7 @@ export function Footer() {
 
           {/* Navigation */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Навигация</h4>
+            <h2 className="font-semibold text-foreground">Навигация</h2>
             <nav className="flex flex-col gap-2">
               {[
                 { href: '/catalog', label: 'Каталог растений' },
@@ -44,7 +47,7 @@ export function Footer() {
 
           {/* Categories */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Категории</h4>
+            <h2 className="font-semibold text-foreground">Категории</h2>
             <nav className="flex flex-col gap-2">
               {[
                 { href: '/catalog?category=conifers', label: 'Хвойные' },
@@ -65,21 +68,26 @@ export function Footer() {
 
           {/* Contacts */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Контакты</h4>
+            <h2 className="font-semibold text-foreground">Контакты</h2>
             <div className="space-y-3">
               <div className="flex items-start gap-3">
                 <PhoneIcon className="h-5 w-5 shrink-0" />
-                <span className="text-sm text-muted-foreground">+375 29 343-00-06</span>
+                <a
+                  className="text-sm text-muted-foreground hover:text-foreground"
+                  href={`tel:${settings.phone.replace(/[^+\d]/g, '')}`}
+                >
+                  {settings.phone}
+                </a>
               </div>
               <div className="flex items-start gap-3">
                 <MapPinIcon className="h-5 w-5 shrink-0" />
                 <span className="text-sm text-muted-foreground">
-                  Минская обл., Минский р-н, д. Обчак, ул. Западная
+                  {settings.addressRegion}, {settings.addressLocality}, {settings.streetAddress}
                 </span>
               </div>
               <div className="flex items-start gap-3">
                 <ClockIcon className="h-5 w-5 shrink-0" />
-                <span className="text-sm text-muted-foreground">Пн-Пт: 9:00 - 18:00, Сб: 9:00 - 17:00</span>
+                <span className="text-sm text-muted-foreground">{settings.workingHours}</span>
               </div>
             </div>
           </div>

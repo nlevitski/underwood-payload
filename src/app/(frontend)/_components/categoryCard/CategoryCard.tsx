@@ -64,6 +64,7 @@ export function CategoryCard({
           placeholder={blurDataUrl ? 'blur' : 'empty'}
           blurDataURL={blurDataUrl}
           className="object-cover [filter:saturate(0.96)_contrast(1.02)] transition-transform duration-[420ms] ease-out group-hover:scale-[1.045] group-focus-visible:scale-[1.045]"
+          quality={65}
           sizes="(max-width: 760px) 100vw, 50vw"
         />
       </div>

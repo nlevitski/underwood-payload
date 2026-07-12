@@ -1,6 +1,10 @@
+import type { Metadata } from 'next'
+
 import { getPayloadClient } from '@/lib/payload/client'
 import { CatalogClient } from './CatalogClient'
 import { getDbProducts } from './dbProducts'
+import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { buildMetadata } from '@/lib/seo/metadata'
 
 type CatalogSearchParams = Record<string, string | string[] | undefined>
 
@@ -26,6 +30,24 @@ function serializeSearchParams(searchParams: CatalogSearchParams) {
   return params.toString()
 }
 
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<CatalogSearchParams>
+}): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams
+  const [page, settings] = await Promise.all([getPageGlobal('catalog-page'), getSiteSettings()])
+
+  return buildMetadata({
+    meta: page.meta,
+    settings,
+    path: '/catalog',
+    fallbackTitle: page.heading,
+    fallbackDescription: page.description,
+    noIndex: serializeSearchParams(resolvedSearchParams).length > 0,
+  })
+}
+
 export default async function CatalogPage({
   searchParams,
 }: {
@@ -33,7 +55,10 @@ export default async function CatalogPage({
 }) {
   const resolvedSearchParams = await searchParams
   const payload = await getPayloadClient()
-  const dbProducts = await getDbProducts(payload)
+  const [dbProducts, page] = await Promise.all([
+    getDbProducts(payload),
+    getPageGlobal('catalog-page'),
+  ])
 
   const queryKey = serializeSearchParams(resolvedSearchParams) || 'catalog'
 
@@ -42,6 +67,8 @@ export default async function CatalogPage({
       key={queryKey}
       initialSearchParams={resolvedSearchParams}
       products={dbProducts}
+      heading={page.heading}
+      description={page.description}
     />
   )
 }

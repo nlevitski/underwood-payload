@@ -21,6 +21,7 @@ export async function getArticles() {
         author: true,
         category: true,
         coverImage: true,
+        meta: true,
         status: true,
         readTimeInMins: true,
         publishedAt: true,

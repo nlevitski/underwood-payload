@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
@@ -10,8 +10,11 @@ import { Button } from '@/components/ui/button'
 
 import { BlogCard } from '../../_components/blogCard/BlogCard'
 import { getBlogPost, getBlogPostSlugs, getRelatedPosts } from '../data'
+import { getSiteSettings } from '@/globals/fetchers'
+import { absoluteURL, buildMetadata } from '@/lib/seo/metadata'
+import { JsonLd } from '@/components/JsonLd'
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export async function generateStaticParams() {
   return getBlogPostSlugs()
@@ -23,32 +26,73 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const post = await getBlogPost(slug)
+  const [post, settings] = await Promise.all([getBlogPost(slug), getSiteSettings()])
 
   if (!post) {
     return {
-      title: 'Блог | Underwood',
+      title: `Статья не найдена | ${settings.siteName}`,
+      robots: { index: false, follow: false },
     }
   }
 
-  return {
-    title: `${post.title} | Underwood`,
-    description: post.excerpt,
-  }
+  return buildMetadata({
+    meta: post.meta,
+    settings,
+    path: `/blog/${slug}`,
+    fallbackTitle: post.title,
+    fallbackDescription: post.excerpt,
+    fallbackImage: post.image,
+    type: 'article',
+    publishedTime: post.publishedAt,
+    modifiedTime: post.updatedAt,
+  })
 }
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const post = await getBlogPost(slug)
+  const [post, settings] = await Promise.all([getBlogPost(slug), getSiteSettings()])
 
   if (!post) {
-    redirect('/blog')
+    notFound()
   }
 
   const related = await getRelatedPosts(post.id, 3)
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.meta?.description || post.excerpt,
+    image: absoluteURL(post.image),
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt,
+    author: {
+      '@type': 'Person',
+      name: post.author,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: settings.siteName,
+      logo: {
+        '@type': 'ImageObject',
+        url: absoluteURL('/android-chrome-512x512.png'),
+      },
+    },
+    mainEntityOfPage: absoluteURL(`/blog/${slug}`),
+  }
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Главная', item: absoluteURL('/') },
+      { '@type': 'ListItem', position: 2, name: 'Блог', item: absoluteURL('/blog') },
+      { '@type': 'ListItem', position: 3, name: post.title, item: absoluteURL(`/blog/${slug}`) },
+    ],
+  }
 
   return (
     <>
+      <JsonLd data={articleJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <section className="border-b border-border/50 bg-cream-dark py-6">
         <div className="container">
           <nav className="text-sm text-muted-foreground">

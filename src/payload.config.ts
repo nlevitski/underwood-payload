@@ -2,6 +2,7 @@ import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { FixedToolbarFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { formBuilderPlugin } from '@payloadcms/plugin-form-builder'
+import { seoPlugin } from '@payloadcms/plugin-seo'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -26,10 +27,29 @@ import { GalleryImages } from './collections/GalleryImages/config'
 import { HomepageCategoryCards } from './collections/HomepageCategoryCards/config'
 import { HomepagePopularPlants } from './collections/HomepagePopularPlants/config'
 import { backfillHomepagePopularPlantHierarchy } from './collections/HomepagePopularPlants/backfill-hierarchy'
+import { SiteSettings } from './globals/SiteSettings'
+import {
+  AboutPage,
+  BlogPage,
+  CatalogPage,
+  ContactsPage,
+  GalleryPage,
+  Homepage,
+} from './globals/pageGlobals'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const emailEnv = getEmailEnvIfConfigured()
+const siteURL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://underwood.by').replace(/\/$/, '')
+
+const globalPaths: Record<string, string> = {
+  homepage: '/',
+  'about-page': '/about',
+  'catalog-page': '/catalog',
+  'blog-page': '/blog',
+  'gallery-page': '/gallery',
+  'contacts-page': '/contacts',
+}
 
 export default buildConfig({
   onInit: backfillHomepagePopularPlantHierarchy,
@@ -79,11 +99,8 @@ export default buildConfig({
     HomepagePopularPlants,
     Articles,
     ArticleAuthors,
-    {
-      slug: 'pages',
-      fields: [],
-    },
   ],
+  globals: [SiteSettings, Homepage, AboutPage, CatalogPage, BlogPage, GalleryPage, ContactsPage],
   editor: lexicalEditor({
     features: ({ defaultFeatures }) => [...defaultFeatures, FixedToolbarFeature()],
   }),
@@ -92,12 +109,51 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteAdapter({
+    // The project deploys a verified SQLite snapshot. Automatic dev pushes can race
+    // across Next.js workers and attempt to recreate existing indexes.
+    push: false,
     client: {
       url: env.DATABASE_URL,
     },
   }),
   sharp,
   plugins: [
+    seoPlugin({
+      collections: ['articles', 'product-items'],
+      globals: [
+        'homepage',
+        'about-page',
+        'catalog-page',
+        'blog-page',
+        'gallery-page',
+        'contacts-page',
+      ],
+      uploadsCollection: 'media',
+      tabbedUI: true,
+      generateTitle: ({ doc }) => {
+        const title = doc?.title ?? doc?.nameRu ?? doc?.heading
+
+        return title ? `${title} | Underwood` : 'Underwood'
+      },
+      generateDescription: ({ doc }) =>
+        doc?.contentSummary ?? doc?.description ?? 'Питомник растений Underwood в Беларуси.',
+      generateImage: ({ doc }) => {
+        const image = doc?.coverImage ?? doc?.heroImage
+
+        return typeof image === 'object' && image !== null ? image.id : (image ?? '')
+      },
+      generateURL: ({ collectionConfig, doc, globalConfig }) => {
+        if (collectionConfig?.slug === 'articles') {
+          return `${siteURL}/blog/${doc?.slug ?? ''}`
+        }
+
+        if (collectionConfig?.slug === 'product-items') {
+          return `${siteURL}/catalog/${doc?.slug ?? ''}`
+        }
+
+        return `${siteURL}${globalPaths[globalConfig?.slug ?? ''] ?? '/'}`
+      },
+    }),
     formBuilderPlugin({
       fields: {
         text: true,

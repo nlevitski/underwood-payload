@@ -38,7 +38,7 @@ export async function Hero({
   ),
   breadcrumb,
   actions,
-  imageSrc = heroImageSrc,
+  imageSrc,
   imageAlt = 'Питомник Underwood',
   blurDataUrl,
   heightClassName = 'min-h-[85vh]',
@@ -48,9 +48,8 @@ export async function Hero({
   titleClassName = 'text-4xl md:text-5xl lg:text-6xl',
 }: HeroProps) {
   const payload = await getPayloadClient()
-  const defaultImage =
-    imageSrc === heroImageSrc ? await getMediaImageByFilename(payload, heroImageFilename) : null
-  const resolvedImageSrc = defaultImage?.src ?? imageSrc
+  const defaultImage = imageSrc ? null : await getMediaImageByFilename(payload, heroImageFilename)
+  const resolvedImageSrc = imageSrc ?? defaultImage?.src ?? heroImageSrc
   const resolvedBlurDataUrl = blurDataUrl ?? defaultImage?.blurDataUrl
 
   const defaultActions = (
@@ -82,6 +81,8 @@ export async function Hero({
           blurDataURL={resolvedBlurDataUrl}
           className="object-cover"
           priority
+          quality={70}
+          sizes="100vw"
         />
         <div className={cn('absolute inset-0', overlayClassName)} />
       </div>

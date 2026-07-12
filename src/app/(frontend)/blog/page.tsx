@@ -4,16 +4,25 @@ import * as motion from 'motion/react-client'
 
 import { BlogCard } from '../_components/blogCard/BlogCard'
 import { getBlogPosts } from './data'
+import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { buildMetadata } from '@/lib/seo/metadata'
 
-export const metadata: Metadata = {
-  title: 'Блог | Underwood',
-  description: 'Полезные статьи по уходу за растениями и агротехнике.',
+export async function generateMetadata(): Promise<Metadata> {
+  const [page, settings] = await Promise.all([getPageGlobal('blog-page'), getSiteSettings()])
+
+  return buildMetadata({
+    meta: page.meta,
+    settings,
+    path: '/blog',
+    fallbackTitle: page.heading,
+    fallbackDescription: page.description,
+  })
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export default async function BlogPage() {
-  const blogPosts = await getBlogPosts()
+  const [blogPosts, page] = await Promise.all([getBlogPosts(), getPageGlobal('blog-page')])
 
   return (
     <>
@@ -26,10 +35,8 @@ export default async function BlogPage() {
             <span className="mx-2">/</span>
             <span className="text-foreground">Блог</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground md:text-4xl">Блог питомника</h1>
-          <p className="mt-2 text-muted-foreground">
-            Полезные статьи по уходу за растениями и агротехнике
-          </p>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{page.heading}</h1>
+          <p className="mt-2 text-muted-foreground">{page.description}</p>
         </div>
       </section>
 

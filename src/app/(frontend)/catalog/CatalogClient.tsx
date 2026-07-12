@@ -36,6 +36,8 @@ type CatalogSearchParams = Record<string, string | string[] | undefined>
 type CatalogClientProps = {
   initialSearchParams: CatalogSearchParams
   products: DBProduct[]
+  heading: string
+  description: string
 }
 
 type CatalogState = {
@@ -203,7 +205,12 @@ function findLowestPricedSelection(
   return lowestSelection
 }
 
-export function CatalogClient({ initialSearchParams, products }: CatalogClientProps) {
+export function CatalogClient({
+  initialSearchParams,
+  products,
+  heading,
+  description,
+}: CatalogClientProps) {
   const router = useRouter()
   const pathname = usePathname()
   // Calculate dynamic filter values from products
@@ -497,7 +504,8 @@ export function CatalogClient({ initialSearchParams, products }: CatalogClientPr
             <span className="mx-2">/</span>
             <span className="text-foreground">Каталог</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground md:text-4xl">Каталог растений</h1>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{heading}</h1>
+          <p className="mt-2 max-w-3xl text-muted-foreground">{description}</p>
         </div>
       </section>
 

@@ -1,12 +1,19 @@
 import Link from 'next/link'
 import { Hero } from '../hero/Hero'
 
-export function AboutHero() {
+type AboutHeroProps = {
+  heading: string
+  description: string
+  imageSrc?: string
+}
+
+export function AboutHero({ heading, description, imageSrc }: AboutHeroProps) {
   return (
     <Hero
-      title="О питомнике Underwood"
+      title={heading}
       subtitle={null}
-      description="Питомник с 10-летним опытом выращивания хвойных и ягодных культур в Беларуси"
+      description={description}
+      imageSrc={imageSrc}
       heightClassName="py-20 md:py-32"
       containerPaddingClassName=""
       titleClassName="text-4xl md:text-5xl"

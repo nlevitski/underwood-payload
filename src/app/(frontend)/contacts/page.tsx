@@ -6,13 +6,25 @@ import * as motion from 'motion/react-client'
 
 import { ContactForm } from './ContactForm'
 import { WorkingHoursIndicator } from './WorkingHoursIndicator'
+import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { buildMetadata } from '@/lib/seo/metadata'
 
-export const metadata: Metadata = {
-  title: 'Контакты | Underwood',
-  description: 'Контакты питомника Underwood, карта, часы работы и форма обратной связи.',
+export async function generateMetadata(): Promise<Metadata> {
+  const [page, settings] = await Promise.all([getPageGlobal('contacts-page'), getSiteSettings()])
+
+  return buildMetadata({
+    meta: page.meta,
+    settings,
+    path: '/contacts',
+    fallbackTitle: page.heading,
+    fallbackDescription: page.description,
+  })
 }
 
-export default function ContactsPage() {
+export default async function ContactsPage() {
+  const [page, settings] = await Promise.all([getPageGlobal('contacts-page'), getSiteSettings()])
+  const phoneHref = `tel:${settings.phone.replace(/[^+\d]/g, '')}`
+
   return (
     <>
       <section className="py-12 bg-cream-dark">
@@ -24,8 +36,8 @@ export default function ContactsPage() {
             <span className="mx-2">/</span>
             <span className="text-foreground">Контакты</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground md:text-4xl">Контакты</h1>
-          <p className="mt-2 text-muted-foreground">Свяжитесь с нами или приезжайте в питомник</p>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{page.heading}</h1>
+          <p className="mt-2 text-muted-foreground">{page.description}</p>
         </div>
       </section>
 
@@ -44,27 +56,27 @@ export default function ContactsPage() {
                   <ContactDetail
                     icon={Phone}
                     label="Телефон"
-                    value="+375 29 343-00-06"
-                    href="tel:+375293430006"
+                    value={settings.phone}
+                    href={phoneHref}
                     description="Звоните в рабочие часы"
                   />
                   <ContactDetail
                     icon={Mail}
                     label="Email"
-                    value="info@underwood.by"
-                    href="mailto:info@underwood.by"
+                    value={settings.email}
+                    href={`mailto:${settings.email}`}
                     description="Ответим в течение дня"
                   />
                   <ContactDetail
                     icon={MapPin}
                     label="Адрес"
-                    value="Минская область, Минский район"
-                    description="д. Обчак, ул. Западная"
+                    value={settings.addressRegion}
+                    description={`${settings.addressLocality}, ${settings.streetAddress}`}
                   />
                   <ContactDetail
                     icon={Clock}
                     label="Часы работы"
-                    value="Пн-Пт: 9:00 - 18:00, Сб: 9:00 - 17:00"
+                    value={settings.workingHours}
                     description="Воскресенье - выходной"
                   >
                     <WorkingHoursIndicator />

@@ -62,6 +62,7 @@ export async function About() {
                 placeholder={nurseryImage?.blurDataUrl ? 'blur' : 'empty'}
                 blurDataURL={nurseryImage?.blurDataUrl}
                 className="object-cover"
+                quality={65}
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>

@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { syncVariantSkusOnItemSlugChangeHook } from './hooks/sync-variant-skus.hook'
+import { revalidateProduct } from '@/hooks/revalidate-frontend.hook'
 
 export const ProductItems: CollectionConfig = {
   slug: 'product-items',
@@ -44,6 +45,6 @@ export const ProductItems: CollectionConfig = {
     },
   ],
   hooks: {
-    afterChange: [syncVariantSkusOnItemSlugChangeHook],
+    afterChange: [syncVariantSkusOnItemSlugChangeHook, revalidateProduct],
   },
 }

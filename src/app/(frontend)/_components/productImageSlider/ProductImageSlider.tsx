@@ -105,6 +105,7 @@ export function ProductImageSlider({
               loading={priority && index === 0 ? undefined : imageLoading}
               placeholder={image.blurDataUrl ? 'blur' : 'empty'}
               blurDataURL={image.blurDataUrl || undefined}
+              quality={compact ? 65 : 75}
               sizes={sizes}
               draggable={false}
               className="object-cover"

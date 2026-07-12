@@ -2,6 +2,7 @@ import thujaImage from '@/assets/plant-thuja.jpg'
 import type { Article, ArticleAuthor, Media } from '@/payload-types'
 
 import { getArticleBySlug, getArticles } from '@/collections/Articles/fetchers'
+import type { SeoMeta } from '@/globals/fetchers'
 
 export interface BlogPost {
   id: string
@@ -14,6 +15,9 @@ export interface BlogPost {
   author: string
   readTime: string
   content?: Article['content']
+  meta?: SeoMeta | null
+  publishedAt?: string | null
+  updatedAt?: string | null
 }
 
 type Relation<T> = number | null | undefined | T
@@ -126,6 +130,9 @@ function normalizeArticleCard(article: Article): BlogPost {
     category: article.category,
     author: resolveAuthorName(article.author),
     readTime: formatReadTime(article.readTimeInMins),
+    meta: (article as Article & { meta?: SeoMeta | null }).meta,
+    publishedAt: article.publishedAt,
+    updatedAt: article.updatedAt,
   }
 }
 

@@ -3,6 +3,7 @@ import { generateSlugHook } from './hooks/generate-slug.hook'
 import { generateContentSummaryHook } from './hooks/generate-content-summary.hook'
 import { convertLexicalToPlaintext } from '@payloadcms/richtext-lexical/plaintext'
 import { statusOptions } from './constants'
+import { revalidateArticle } from '@/hooks/revalidate-frontend.hook'
 
 // fields
 // - tags (optional, relationship to tags)
@@ -12,6 +13,9 @@ import { statusOptions } from './constants'
 
 export const Articles: CollectionConfig = {
   slug: 'articles',
+  hooks: {
+    afterChange: [revalidateArticle],
+  },
   fields: [
     {
       name: 'title',

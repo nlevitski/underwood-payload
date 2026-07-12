@@ -36,7 +36,7 @@ export function Features() {
                 <feature.icon className="h-6 w-6 text-forest" />
               </div>
               <div>
-                <h3 className="font-semibold text-foreground mb-1">{feature.title}</h3>
+                <h2 className="font-semibold text-foreground mb-1">{feature.title}</h2>
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
               </div>
             </motion.div>

@@ -14,7 +14,7 @@ const navLinks = [
   { href: '/contacts', label: 'Контакты' },
 ]
 
-export function Header() {
+export function Header({ siteName = 'Underwood' }: { siteName?: string }) {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -23,7 +23,7 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between md:h-20">
         <Link href="/" className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
           <LogoIcon />
-          <span className="text-xl font-bold tracking-tight text-foreground">Underwood</span>
+          <span className="text-xl font-bold tracking-tight text-foreground">{siteName}</span>
         </Link>
 
         {/* Desktop Navigation */}

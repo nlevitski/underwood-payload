@@ -11,6 +11,7 @@ import type {
   ProductVariant as PayloadProductVariant,
 } from '@/payload-types'
 import type { Payload } from 'payload'
+import type { SeoMeta } from '@/globals/fetchers'
 
 import type { Care, CategoryKey, Product, ProductAttributes } from './products'
 import { comparePotCodes, getSizeLowerBound } from './productVariantSorting'
@@ -51,7 +52,9 @@ type DBProductVariant = DBProductVariantBase | DBProductVariantWithValue
 export type DBProduct = Omit<Product, 'id' | 'image' | 'variants'> & {
   itemId: number
   slug: string
+  updatedAt: string
   image: string
+  meta?: SeoMeta | null
   variants: DBProductVariant[]
 }
 
@@ -397,6 +400,8 @@ function normalizeProduct(groupedProduct: GroupedProduct): DBProduct | null {
   return {
     itemId: groupedProduct.item.id,
     slug: groupedProduct.item.slug,
+    updatedAt: groupedProduct.item.updatedAt,
+    meta: (groupedProduct.item as PayloadProductItem & { meta?: SeoMeta | null }).meta,
     name: resolveProductName(groupedProduct.item, groupedProduct.category),
     description: resolveDescription(groupedProduct.item),
     attributes: resolveProductAttributes(groupedProduct.item),

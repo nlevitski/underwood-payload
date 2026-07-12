@@ -5,17 +5,29 @@ import * as motion from 'motion/react-client'
 
 import { getGalleryImages } from '@/collections/GalleryImages/fetchers'
 import { getPayloadClient } from '@/lib/payload/client'
+import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { buildMetadata } from '@/lib/seo/metadata'
 
-export const metadata: Metadata = {
-  title: 'Фото питомника | Underwood',
-  description: 'Галерея питомника Underwood: поля, контейнерные растения и отдельные культуры.',
+export async function generateMetadata(): Promise<Metadata> {
+  const [page, settings] = await Promise.all([getPageGlobal('gallery-page'), getSiteSettings()])
+
+  return buildMetadata({
+    meta: page.meta,
+    settings,
+    path: '/gallery',
+    fallbackTitle: page.heading,
+    fallbackDescription: page.description,
+  })
 }
 
-export const dynamic = 'force-dynamic'
+export const revalidate = 300
 
 export default async function GalleryPage() {
   const payload = await getPayloadClient()
-  const images = await getGalleryImages(payload)
+  const [images, page] = await Promise.all([
+    getGalleryImages(payload),
+    getPageGlobal('gallery-page'),
+  ])
 
   return (
     <>
@@ -28,8 +40,8 @@ export default async function GalleryPage() {
             <span className="mx-2">/</span>
             <span className="text-foreground">Фото питомника</span>
           </nav>
-          <h1 className="text-3xl font-bold text-foreground md:text-4xl">Фото питомника</h1>
-          <p className="mt-2 text-muted-foreground">Реальные фотографии наших полей и растений</p>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{page.heading}</h1>
+          <p className="mt-2 text-muted-foreground">{page.description}</p>
         </div>
       </section>
 

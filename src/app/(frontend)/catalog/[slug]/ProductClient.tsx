@@ -18,7 +18,7 @@ const valueMap = {
   age: 'Возраст',
 }
 
-export function ProductClient({ product }: { product: DBProduct }) {
+export function ProductClient({ product, phone }: { product: DBProduct; phone: string }) {
   const initialVariant = product.variants[0]
   const initialPot = initialVariant?.pots[0]
   const hasVariantSelection = product.valueType !== 'none'
@@ -190,7 +190,7 @@ export function ProductClient({ product }: { product: DBProduct }) {
             </Link>
           </Button>
           <Button variant="outline" size="lg" asChild>
-            <a href="tel:+375293430006">+375 29 343-00-06</a>
+            <a href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a>
           </Button>
         </div>
       </motion.div>

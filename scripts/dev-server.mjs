@@ -11,41 +11,33 @@ if (shouldClean) {
 }
 
 const nextBin = fileURLToPath(new URL('../node_modules/next/dist/bin/next', import.meta.url))
-const isWindows = process.platform === 'win32'
 const child = spawn(process.execPath, [nextBin, 'dev'], {
-  detached: !isWindows,
+  // Keep Next in the terminal's foreground process group. A detached child
+  // can survive VS Code's Kill Terminal because the terminal no longer owns it.
+  detached: false,
   env: {
     ...process.env,
     NODE_OPTIONS: [process.env.NODE_OPTIONS, '--no-deprecation'].filter(Boolean).join(' '),
+    NEXT_TELEMETRY_DISABLED: '1',
   },
   stdio: 'inherit',
 })
 
 let forceKillTimer
 let stoppingSignal
-
-function signalChildProcessGroup(signal) {
-  try {
-    if (isWindows) {
-      child.kill(signal)
-    } else {
-      process.kill(-child.pid, signal)
-    }
-  } catch (error) {
-    if (error?.code !== 'ESRCH') {
-      throw error
-    }
-  }
-}
+let childExited = false
 
 function stop(signal) {
   if (stoppingSignal) return
 
   stoppingSignal = signal
-  signalChildProcessGroup(signal)
+
+  if (!child.killed) {
+    child.kill(signal)
+  }
 
   forceKillTimer = setTimeout(() => {
-    signalChildProcessGroup('SIGKILL')
+    if (!childExited) child.kill('SIGKILL')
   }, 5_000)
   forceKillTimer.unref()
 }
@@ -60,6 +52,8 @@ child.once('error', (error) => {
 })
 
 child.once('exit', (code, signal) => {
+  childExited = true
+
   if (forceKillTimer) clearTimeout(forceKillTimer)
 
   if (stoppingSignal === 'SIGINT') {
