@@ -29,6 +29,8 @@ export const env = createEnv({
     SMTP_TARGET_EMAIL: z.email().optional(),
     TELEGRAM_TOKEN: z.string().min(1).optional(),
     TELEGRAM_GROUP_CHAT_ID: z.string().min(1).optional(),
+    GOOGLE_MEASUREMENT_ID: z.string().min(1).optional(),
+    GOOGLE_DATA_STREAM_ID: z.string().min(1).optional(),
   },
   client: {},
   runtimeEnv: {
@@ -44,6 +46,8 @@ export const env = createEnv({
     SMTP_TARGET_EMAIL: process.env.SMTP_TARGET_EMAIL,
     TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
     TELEGRAM_GROUP_CHAT_ID: process.env.TELEGRAM_GROUP_CHAT_ID,
+    GOOGLE_MEASUREMENT_ID: process.env.GOOGLE_MEASUREMENT_ID,
+    GOOGLE_DATA_STREAM_ID: process.env.GOOGLE_DATA_STREAM_ID,
   },
 })
 

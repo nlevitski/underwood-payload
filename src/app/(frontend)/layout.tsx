@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { ThemeProvider } from '@/components/theme-provider'
 import './global.css'
 import { Footer } from './Footer'
@@ -7,6 +8,7 @@ import { Header } from './Header'
 import { JsonLd } from '@/components/JsonLd'
 import { getSiteSettings } from '@/globals/fetchers'
 import { resolveMediaURL, siteURL } from '@/lib/seo/metadata'
+import { env } from '@/lib/env'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
@@ -59,6 +61,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="ru" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body className="flex min-h-screen flex-col antialiased">
+        {process.env.NODE_ENV === 'production' && env.GOOGLE_MEASUREMENT_ID ? (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${env.GOOGLE_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${env.GOOGLE_MEASUREMENT_ID}');
+              `}
+            </Script>
+          </>
+        ) : null}
         <JsonLd data={localBusinessJsonLd} />
         <ThemeProvider
           attribute="class"
