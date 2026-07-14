@@ -2,6 +2,9 @@ import { withPayload } from '@payloadcms/next/withPayload'
 import withPlaiceholder from '@plaiceholder/next'
 
 const isProduction = process.env.NODE_ENV === 'production'
+const payloadServerURL =
+  process.env.PAYLOAD_PUBLIC_SERVER_URL ??
+  (isProduction ? 'https://underwood.by' : 'http://localhost:3000')
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -49,6 +52,7 @@ const nextConfig = {
   ...(process.env.NEXT_OUTPUT_STANDALONE === 'true' ? { output: 'standalone' } : {}),
   images: {
     qualities: [65, 70, 75],
+    remotePatterns: [new URL('/api/media/file/**', payloadServerURL)],
   },
   outputFileTracingExcludes: {
     '*': ['./data/**/*', './media/**/*'],
