@@ -64,4 +64,10 @@ jobs:
           "
 
       - name: Deploy on VPS
-        run: ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "cd '${DEPLOY_PATH}' && docker compose -f docker-compose.prod.yml up -d --build --remove-orphans"
+        run: |
+          ssh "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" "
+            set -e
+            cd '${DEPLOY_PATH}'
+            bash scripts/prepare-docker-build-database.sh
+            docker compose -f docker-compose.prod.yml up -d --build --remove-orphans
+          "
