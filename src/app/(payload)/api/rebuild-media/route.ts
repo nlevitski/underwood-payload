@@ -1,9 +1,18 @@
+import config from '@payload-config'
 import { NextResponse } from 'next/server'
+import { getPayload } from 'payload'
 import sharp from 'sharp'
-import payload from 'payload'
 
 export async function POST(req: Request) {
+  const payload = await getPayload({ config })
+
   try {
+    const { user } = await payload.auth({ headers: req.headers })
+
+    if (!user || user.collection !== 'users') {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    }
+
     const { id } = await req.json()
 
     if (!id) {
@@ -13,6 +22,8 @@ export async function POST(req: Request) {
     const media = await payload.findByID({
       collection: 'media',
       id,
+      overrideAccess: false,
+      user,
     })
 
     if (!media?.url) {
@@ -43,16 +54,13 @@ export async function POST(req: Request) {
           .toBuffer()
 
         return out
-      })
+      }),
     )
 
     return NextResponse.json({ ok: true })
   } catch (e) {
-    console.error(e)
+    payload.logger.error({ err: e, msg: 'Media rebuild failed' })
 
-    return NextResponse.json(
-      { error: 'rebuild failed' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'rebuild failed' }, { status: 500 })
   }
 }

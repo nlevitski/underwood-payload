@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 FROM node:22.22-slim AS base
 
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -17,21 +19,18 @@ RUN CI=true pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
-ARG DATABASE_URL
-ARG PAYLOAD_SECRET
-ARG CMS_SEED_ADMIN_EMAIL
-ARG CMS_SEED_ADMIN_PASSWORD
-
-ENV DATABASE_URL=${DATABASE_URL}
-ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
-ENV CMS_SEED_ADMIN_EMAIL=${CMS_SEED_ADMIN_EMAIL}
-ENV CMS_SEED_ADMIN_PASSWORD=${CMS_SEED_ADMIN_PASSWORD}
 ENV NEXT_OUTPUT_STANDALONE=true
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-RUN pnpm build
+RUN --mount=type=secret,id=build_database,required=true \
+    node -e "const fs = require('node:fs'); const zlib = require('node:zlib'); fs.writeFileSync('/tmp/underwood-build.db', zlib.gunzipSync(fs.readFileSync('/run/secrets/build_database')))" \
+    && DATABASE_URL=file:/tmp/underwood-build.db \
+       PAYLOAD_SECRET=build-only-payload-secret-not-used-at-runtime \
+       PAYLOAD_PUBLIC_SERVER_URL=https://underwood.by \
+       pnpm build \
+    && rm -f /tmp/underwood-build.db /tmp/underwood-build.db-shm /tmp/underwood-build.db-wal
 RUN mkdir -p /app/.sharp-libvips && cp -a /app/node_modules/.pnpm/@img+sharp-libvips-* /app/.sharp-libvips/
 
 FROM base AS runner

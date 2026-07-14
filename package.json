@@ -7,6 +7,7 @@
   "packageManager": "pnpm@10.34.5",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build:docker": "bash scripts/prepare-docker-build-database.sh && docker compose -f docker-compose.prod.yml build",
     "backfill:media-blur": "tsx -r dotenv/config src/scripts/backfill-media-blur-data-urls.ts",
     "deploy:content": "bash scripts/deploy-content.sh",
     "dev": "node scripts/dev-server.mjs",
@@ -17,6 +18,7 @@
     "lint": "cross-env NODE_OPTIONS=--no-deprecation next lint",
     "migrate:blog": "tsx -r dotenv/config src/scripts/migrate-static-blog-articles.ts",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "seed:admin": "tsx -r dotenv/config src/scripts/seed-admin.ts",
     "start": "set -a && . ./.env && set +a && exec env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
@@ -67,7 +69,6 @@
     "@types/node": "26.1.0",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.3",
     "eslint": "^10.6.0",
     "eslint-config-next": "16.2.10",
     "jsdom": "29.1.1",

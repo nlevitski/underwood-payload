@@ -40,7 +40,20 @@ import {
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const emailEnv = getEmailEnvIfConfigured()
+const isDevelopment = process.env.NODE_ENV === 'development'
+const payloadServerURL = (
+  env.PAYLOAD_PUBLIC_SERVER_URL ??
+  (isDevelopment ? `http://localhost:${process.env.PORT ?? '3000'}` : 'https://underwood.by')
+).replace(/\/$/, '')
 const siteURL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://underwood.by').replace(/\/$/, '')
+const autoLogin =
+  isDevelopment && env.CMS_SEED_ADMIN_EMAIL && env.CMS_SEED_ADMIN_PASSWORD
+    ? {
+        email: env.CMS_SEED_ADMIN_EMAIL,
+        password: env.CMS_SEED_ADMIN_PASSWORD,
+        prefillOnly: true,
+      }
+    : false
 
 const globalPaths: Record<string, string> = {
   homepage: '/',
@@ -53,6 +66,9 @@ const globalPaths: Record<string, string> = {
 
 export default buildConfig({
   onInit: backfillHomepagePopularPlantHierarchy,
+  serverURL: payloadServerURL,
+  cors: [payloadServerURL],
+  csrf: [payloadServerURL],
   ...(emailEnv
     ? {
         email: nodemailerAdapter({
@@ -76,10 +92,7 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
-    autoLogin: {
-      email: env.CMS_SEED_ADMIN_EMAIL,
-      password: env.CMS_SEED_ADMIN_PASSWORD,
-    },
+    autoLogin,
   },
   collections: [
     Users,

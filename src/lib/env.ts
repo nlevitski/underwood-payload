@@ -17,10 +17,11 @@ const telegramEnvSchema = z.object({
 
 export const env = createEnv({
   server: {
-    PAYLOAD_SECRET: z.string().min(1),
+    PAYLOAD_SECRET: z.string().min(24),
+    PAYLOAD_PUBLIC_SERVER_URL: z.url().optional(),
     DATABASE_URL: z.string(),
-    CMS_SEED_ADMIN_EMAIL: z.email(),
-    CMS_SEED_ADMIN_PASSWORD: z.string().min(8),
+    CMS_SEED_ADMIN_EMAIL: z.email().optional(),
+    CMS_SEED_ADMIN_PASSWORD: z.string().min(12).optional(),
     SMTP_HOST: z.string().min(1).optional(),
     SMTP_USER: z.string().min(1).optional(),
     SMTP_EMAIL_PORT: z.coerce.number().int().min(1).max(65535).optional(),
@@ -35,6 +36,7 @@ export const env = createEnv({
   client: {},
   runtimeEnv: {
     PAYLOAD_SECRET: process.env.PAYLOAD_SECRET,
+    PAYLOAD_PUBLIC_SERVER_URL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
     DATABASE_URL: process.env.DATABASE_URL,
     CMS_SEED_ADMIN_EMAIL: process.env.CMS_SEED_ADMIN_EMAIL,
     CMS_SEED_ADMIN_PASSWORD: process.env.CMS_SEED_ADMIN_PASSWORD,

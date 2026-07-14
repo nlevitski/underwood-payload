@@ -1,25 +1,35 @@
-import { Payload } from 'payload'
+import type { Payload } from 'payload'
+
+import { env } from '@/lib/env'
+
 import { isDuplicateError } from '../lib/is-duplicate-error'
 
-const email = process.env.CMS_SEED_ADMIN_EMAIL || ''
-const password = process.env.CMS_SEED_ADMIN_PASSWORD || ''
-
 export async function seedAdmin(payload: Payload) {
+  const email = env.CMS_SEED_ADMIN_EMAIL
+  const password = env.CMS_SEED_ADMIN_PASSWORD
+
+  if (!email || !password) {
+    throw new Error(
+      'Admin seed credentials are missing. Set CMS_SEED_ADMIN_EMAIL and CMS_SEED_ADMIN_PASSWORD.',
+    )
+  }
+
   try {
-    const response = await payload.create({
+    await payload.create({
       collection: 'users',
       data: {
         email,
         password,
       },
     })
-    console.log('Admin seeded successfully:', response)
+    payload.logger.info('Admin user seeded successfully')
   } catch (error) {
     if (isDuplicateError(error, 'email')) {
-      console.log('Admin user already exists')
+      payload.logger.info('Admin user already exists')
       return
-    } else {
-      console.error('Error seeding admin:', JSON.stringify(error, null, 2))
     }
+
+    payload.logger.error({ err: error, msg: 'Unable to seed admin user' })
+    throw error
   }
 }

@@ -5,9 +5,16 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
   },
-  auth: true,
-  fields: [
-    // Email added by default
-    // Add more fields as needed
-  ],
+  auth: {
+    cookies: {
+      sameSite: 'Lax',
+      secure: process.env.NODE_ENV === 'production',
+    },
+    lockTime: 10 * 60 * 1000,
+    maxLoginAttempts: 5,
+    removeTokenFromResponses: true,
+    tokenExpiration: 2 * 60 * 60,
+    useSessions: true,
+  },
+  fields: [],
 }

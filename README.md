@@ -1,67 +1,79 @@
-# Payload Blank Template
+# Underwood Payload
 
-This template comes configured with the bare minimum to get started on anything you need.
+Сайт и CMS питомника Underwood на Next.js и Payload CMS.
 
-## Quick start
+## Локальный запуск
 
-This template can be deployed directly from our Cloud hosting and it will setup MongoDB and cloud S3 object storage for media.
+```bash
+cp .env.example .env
+corepack enable
+pnpm install
+pnpm dev
+```
 
-## Quick Start - local setup
+Для `PAYLOAD_SECRET` используйте случайное значение, например:
 
-To spin up this template locally, follow these steps:
+```bash
+openssl rand -hex 32
+```
 
-### Clone
+Админка доступна по адресу `http://localhost:3000/admin`. В development значения
+`CMS_SEED_ADMIN_EMAIL` и `CMS_SEED_ADMIN_PASSWORD` только предзаполняют форму — вход всё равно
+нужно подтвердить вручную.
 
-After you click the `Deploy` button above, you'll want to have standalone copy of this repo on your machine. If you've already cloned this repo, skip to [Development](#development).
+## Создание администратора
 
-### Development
+Укажите в `.env`:
 
-1. First [clone the repo](#clone) if you have not done so already
-2. `cd my-project && cp .env.example .env` to copy the example environment variables. You'll need to add the `MONGODB_URL` from your Cloud project to your `.env` if you want to use S3 storage and the MongoDB database that was created for you.
+```dotenv
+CMS_SEED_ADMIN_EMAIL=admin@example.com
+CMS_SEED_ADMIN_PASSWORD=replace-with-a-strong-password
+```
 
-3. `pnpm install && pnpm dev` to install dependencies and start the dev server
-4. open `http://localhost:3000` to open the app in your browser
+Затем создайте пользователя без сброса остального контента:
 
-That's it! Changes made in `./src` will be reflected in your app. Follow the on-screen instructions to login and create your first admin user. Then check out [Production](#production) once you're ready to build and serve your app, and [Deployment](#deployment) when you're ready to go live.
+```bash
+pnpm seed:admin
+```
 
-#### Docker (Optional)
+После создания пользователя эти две переменные не нужны приложению в production и могут быть
+удалены из production `.env`. Повторный запуск команды существующего пользователя не изменяет.
 
-If you prefer to use Docker for local development instead of a local MongoDB instance, the provided docker-compose.yml file can be used.
+## Production
 
-To do so, follow these steps:
+Обязательные runtime-переменные:
 
-- Modify the `MONGODB_URL` in your `.env` file to `mongodb://127.0.0.1/<dbname>`
-- Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
-- Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
+```dotenv
+NODE_ENV=production
+DATABASE_URL=file:./data/underwood-payload.db
+PAYLOAD_SECRET=<случайный секрет минимум из 24 символов>
+PAYLOAD_PUBLIC_SERVER_URL=https://underwood.by
+PORT=3005
+```
 
-## How it works
+Production должен работать только за HTTPS. Auth-cookie имеет `Secure`, `HttpOnly` и
+`SameSite=Lax`; Payload принимает cookie-запросы только от `PAYLOAD_PUBLIC_SERVER_URL`.
 
-The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
+Сборка Docker использует сжатый SQLite-снимок как BuildKit secret: база нужна Next.js для
+генерации публичных страниц, но не попадает в build context или image layer. По умолчанию берётся
+`./data/underwood-payload.db`; путь можно переопределить через `BUILD_DATABASE_PATH`.
 
-### Collections
+```bash
+pnpm build:docker
+docker compose -f docker-compose.prod.yml up -d
+```
 
-See the [Collections](https://payloadcms.com/docs/configuration/collections) docs for details on how to extend this functionality.
+Runtime-секрет `PAYLOAD_SECRET` и пароль администратора не передаются как Docker build arguments.
+Каталоги `data/` и `media/` подключаются как постоянные volumes и должны попадать в резервные
+копии.
 
-- #### Users (Authentication)
+После деплоя откройте `https://underwood.by/admin` и войдите по email и паролю созданного
+пользователя. Автоматический вход в production отключён.
 
-  Users are auth-enabled collections that have access to the admin panel.
+## Проверки
 
-  For additional help, see the official [Auth Example](https://github.com/payloadcms/payload/tree/main/examples/auth) or the [Authentication](https://payloadcms.com/docs/authentication/overview#authentication-overview) docs.
-
-- #### Media
-
-  This is the uploads enabled collection. It features pre-configured sizes, focal point and manual resizing to help you manage your pictures.
-
-### Docker
-
-Alternatively, you can use [Docker](https://www.docker.com) to spin up this template locally. To do so, follow these steps:
-
-1. Follow [steps 1 and 2 from above](#development), the docker-compose file will automatically use the `.env` file in your project root
-1. Next run `docker-compose up`
-1. Follow [steps 4 and 5 from above](#development) to login and create your first admin user
-
-That's it! The Docker instance will help you get up and running quickly while also standardizing the development environment across your teams.
-
-## Questions
-
-If you have any issues or questions, reach out to us on [Discord](https://discord.com/invite/payload) or start a [GitHub discussion](https://github.com/payloadcms/payload/discussions).
+```bash
+pnpm exec tsc --noEmit
+pnpm test:int
+pnpm build
+```

@@ -1,9 +1,12 @@
 .git
+.deploy
 .next
 node_modules
 .env
 .env.*
 coverage
+data
 dist
+media
 playwright-report
 test-results
