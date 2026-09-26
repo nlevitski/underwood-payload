@@ -5,13 +5,14 @@ import { fileURLToPath } from 'node:url'
 import { spawn } from 'node:child_process'
 
 const shouldClean = process.argv.includes('--clean')
+const port = process.env.PORT?.trim() || '3005'
 
 if (shouldClean) {
   await rm(new URL('../.next', import.meta.url), { force: true, recursive: true })
 }
 
 const nextBin = fileURLToPath(new URL('../node_modules/next/dist/bin/next', import.meta.url))
-const child = spawn(process.execPath, [nextBin, 'dev'], {
+const child = spawn(process.execPath, [nextBin, 'dev', '--port', port], {
   // Keep Next in the terminal's foreground process group. A detached child
   // can survive VS Code's Kill Terminal because the terminal no longer owns it.
   detached: false,

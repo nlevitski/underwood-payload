@@ -17,7 +17,7 @@ pnpm dev
 openssl rand -hex 32
 ```
 
-Админка доступна по адресу `http://localhost:3000/admin`. В development значения
+Админка доступна по адресу `http://localhost:3005/admin`. В development значения
 `CMS_SEED_ADMIN_EMAIL` и `CMS_SEED_ADMIN_PASSWORD` только предзаполняют форму — вход всё равно
 нужно подтвердить вручную.
 
@@ -66,6 +66,11 @@ docker compose -f docker-compose.prod.yml up -d
 Runtime-секрет `PAYLOAD_SECRET` и пароль администратора не передаются как Docker build arguments.
 Каталоги `data/` и `media/` подключаются как постоянные volumes и должны попадать в резервные
 копии.
+
+Чтобы подтянуть правки контента и новые изображения из production в локальную базу, остановите
+локальный сервер и выполните `pnpm pull:content`. Скрипт делает согласованный SQLite-снимок,
+проверяет его целостность и сохраняет прежнюю локальную базу в `.deploy/pull-*/`.
+Для получения только базы используйте `pnpm pull:content --database`.
 
 После деплоя откройте `https://underwood.by/admin` и войдите по email и паролю созданного
 пользователя. Автоматический вход в production отключён.

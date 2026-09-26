@@ -17,6 +17,8 @@ type ProductPageProps = {
   params: Promise<{ slug: string }>
 }
 
+export const revalidate = 300
+
 const getProduct = cache(async (slug: string) => {
   const payload = await getPayloadClient()
   const products = await getDbProducts(payload)

@@ -43,7 +43,7 @@ const emailEnv = getEmailEnvIfConfigured()
 const isDevelopment = process.env.NODE_ENV === 'development'
 const payloadServerURL = (
   env.PAYLOAD_PUBLIC_SERVER_URL ??
-  (isDevelopment ? `http://localhost:${process.env.PORT ?? '3000'}` : 'https://underwood.by')
+  (isDevelopment ? `http://localhost:${process.env.PORT ?? '3005'}` : 'https://underwood.by')
 ).replace(/\/$/, '')
 const siteURL = (process.env.NEXT_PUBLIC_SITE_URL ?? 'https://underwood.by').replace(/\/$/, '')
 const autoLogin =

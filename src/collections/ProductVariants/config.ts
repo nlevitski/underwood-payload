@@ -6,6 +6,10 @@ import { syncAvailabilityHook } from './hooks/sync-availability.hook'
 import { validateUniqueCombinationHook } from './hooks/validate-unique-combination.hook'
 import { generateSkuHook } from './hooks/generate-sku.hook'
 import { syncCategoryHook } from './hooks/sync-category.hook'
+import {
+  revalidateDeletedProductVariant,
+  revalidateProductVariant,
+} from '@/hooks/revalidate-frontend.hook'
 
 const variantTypeOptions = [
   { label: 'Нет', value: 'none' },
@@ -152,5 +156,7 @@ export const ProductVariants: CollectionConfig = {
   hooks: {
     beforeValidate: [syncCategoryHook, syncVariantSelectionHook, generateSkuHook],
     beforeChange: [validateUniqueCombinationHook, syncAvailabilityHook],
+    afterChange: [revalidateProductVariant],
+    afterDelete: [revalidateDeletedProductVariant],
   },
 }
