@@ -12,9 +12,23 @@ import { getDbProducts } from '../dbProducts'
 import { getSiteSettings } from '@/globals/fetchers'
 import { absoluteURL, buildMetadata, resolveMediaURL } from '@/lib/seo/metadata'
 import { JsonLd } from '@/components/JsonLd'
+import { resolveProductSelection } from '../productSelection'
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}
+
+function selectionParams(values: Record<string, string | string[] | undefined>) {
+  const params = new URLSearchParams()
+
+  for (const key of ['size', 'age', 'pot'] as const) {
+    const value = values[key]
+    if (typeof value === 'string') params.set(key, value)
+    else if (Array.isArray(value)) value.forEach((entry) => params.append(key, entry))
+  }
+
+  return params
 }
 
 export const revalidate = 300
@@ -62,14 +76,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   })
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const { slug } = await params
+export default async function ProductPage({ params, searchParams }: ProductPageProps) {
+  const [{ slug }, query] = await Promise.all([params, searchParams])
   const [{ product, products }, settings] = await Promise.all([getProduct(slug), getSiteSettings()])
 
   if (!product) {
     notFound()
   }
 
+  const selectedQuery = selectionParams(query)
   const pots = product.variants.flatMap((variant) => variant.pots)
   const prices = pots.map((pot) => pot.price)
   const firstImage = pots.flatMap((pot) => pot.images).find((image) => image.url)?.url
@@ -149,7 +164,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </Link>
           </Button>
 
-          <ProductClient product={product} phone={settings.phone} />
+          <ProductClient
+            key={product.slug}
+            product={product}
+            phone={settings.phone}
+            initialSelection={resolveProductSelection(product, selectedQuery)}
+            selectionQuery={selectedQuery.toString()}
+          />
         </div>
       </section>
 

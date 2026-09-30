@@ -9,6 +9,7 @@ import { JsonLd } from '@/components/JsonLd'
 import { getSiteSettings } from '@/globals/fetchers'
 import { resolveMediaURL, siteURL } from '@/lib/seo/metadata'
 import { env } from '@/lib/env'
+import { getSocialLinks } from '@/lib/social-links'
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings()
@@ -38,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings()
   const socialImage = resolveMediaURL(settings.defaultSocialImage)
-  const sameAs = settings.socialLinks?.map(({ url }) => url).filter(Boolean) ?? []
+  const sameAs = getSocialLinks(settings).map(({ url }) => url)
   const localBusinessJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'GardenStore',

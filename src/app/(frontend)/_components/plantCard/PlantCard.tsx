@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import Link from 'next/link'
 import type { DBProduct } from '../../catalog/dbProducts'
+import { productSelectionHref } from '../../catalog/productSelection'
 import { ProductImageSlider } from '../productImageSlider/ProductImageSlider'
 
 const valueMap = {
@@ -42,6 +43,7 @@ export function PlantCard(props: PlantCardProps) {
   // Hover states
   const [hoveredPotId, setHoveredPotId] = useState<number | null>(null)
   const [hoveredVariantId, setHoveredVariantId] = useState<number | null>(null)
+  const selectedHref = productSelectionHref(props, { variantId, potId })
 
   // Use hovered values if hovering, otherwise use selected values
   const displayPotId = hoveredPotId ?? potId
@@ -92,7 +94,7 @@ export function PlantCard(props: PlantCardProps) {
   return (
     <div className="group relative flex h-full flex-col overflow-hidden rounded-xl bg-card shadow-soft transition-all duration-300 hover:shadow-card">
       <Link
-        href={`/catalog/${props.slug}`}
+        href={selectedHref}
         aria-label={`Открыть страницу товара ${props.name}`}
         className="absolute inset-0 z-10 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-forest focus-visible:ring-offset-2"
       />
@@ -104,7 +106,7 @@ export function PlantCard(props: PlantCardProps) {
           imageLoading={props.imageLoading}
           sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
           compact
-          href={`/catalog/${props.slug}`}
+          href={selectedHref}
         />
       </div>
       <div className="flex flex-1 flex-col p-3 space-y-2.5">

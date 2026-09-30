@@ -3,12 +3,13 @@ import type { Metadata } from 'next'
 import { About } from './_components/about/About'
 import { BlogPreview } from './_components/blogPreview/BlogPreview'
 import { Categories } from './_components/categories/Categories'
-import { CTA } from './_components/cTA/CTA'
 import { Features } from './_components/features/Features'
 import { Hero } from './_components/hero/Hero'
 import { NurseryPhotos } from './_components/nurseryPhotos/NurseryPhotos'
 import { PopularPlants } from './_components/popularPlants/PopularPlants'
+import { SocialLinksBand } from './SocialLinks'
 import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { getSocialLinks } from '@/lib/social-links'
 import { buildMetadata, resolveMediaPath } from '@/lib/seo/metadata'
 
 export const revalidate = 300
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const page = await getPageGlobal('homepage')
+  const [page, settings] = await Promise.all([getPageGlobal('homepage'), getSiteSettings()])
 
   return (
     <>
@@ -43,7 +44,7 @@ export default async function HomePage() {
       <PopularPlants />
       <NurseryPhotos />
       <BlogPreview />
-      <CTA />
+      <SocialLinksBand links={getSocialLinks(settings)} tone="plain" />
     </>
   )
 }

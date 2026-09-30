@@ -6,7 +6,9 @@ import * as motion from 'motion/react-client'
 
 import { ContactForm } from './ContactForm'
 import { WorkingHoursIndicator } from './WorkingHoursIndicator'
+import { SocialLinksBand } from '../SocialLinks'
 import { getPageGlobal, getSiteSettings } from '@/globals/fetchers'
+import { getSocialLinks } from '@/lib/social-links'
 import { buildMetadata } from '@/lib/seo/metadata'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -111,6 +113,7 @@ export default async function ContactsPage() {
           </div>
         </div>
       </section>
+      <SocialLinksBand links={getSocialLinks(settings)} />
     </>
   )
 }

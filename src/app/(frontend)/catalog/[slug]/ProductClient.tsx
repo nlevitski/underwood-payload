@@ -1,12 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import * as motion from 'motion/react-client'
 import { Phone } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { DBProduct } from '../dbProducts'
 import { ProductImageSlider } from '../../_components/productImageSlider/ProductImageSlider'
+import {
+  productSelectionParams,
+  resolveProductSelection,
+  type ProductSelection,
+} from '../productSelection'
 
 type VariantWithValue = {
   value: string
@@ -18,19 +23,55 @@ const valueMap = {
   age: 'Возраст',
 }
 
-export function ProductClient({ product, phone }: { product: DBProduct; phone: string }) {
+export function ProductClient({
+  product,
+  phone,
+  initialSelection,
+  selectionQuery,
+}: {
+  product: DBProduct
+  phone: string
+  initialSelection: ProductSelection | null
+  selectionQuery: string
+}) {
   const initialVariant = product.variants[0]
   const initialPot = initialVariant?.pots[0]
   const hasVariantSelection = product.valueType !== 'none'
   const variantLabel = product.valueType === 'none' ? null : valueMap[product.valueType]
   const allPots = product.variants.flatMap((variant) => variant.pots)
 
-  const [variantId, setVariantId] = useState<number>(initialVariant?.id ?? 0)
-  const [potId, setPotId] = useState<number>(initialPot?.id ?? 0)
+  const [variantId, setVariantId] = useState<number>(
+    initialSelection?.variantId ?? initialVariant?.id ?? 0,
+  )
+  const [potId, setPotId] = useState<number>(initialSelection?.potId ?? initialPot?.id ?? 0)
 
   // Hover states
   const [hoveredPotId, setHoveredPotId] = useState<number | null>(null)
   const [hoveredVariantId, setHoveredVariantId] = useState<number | null>(null)
+
+  useEffect(() => {
+    const syncFromURL = () => {
+      const url = new URL(window.location.href)
+      const selection = resolveProductSelection(product, url.searchParams)
+      if (!selection) return
+
+      setVariantId(selection.variantId)
+      setPotId(selection.potId)
+      setHoveredPotId(null)
+      setHoveredVariantId(null)
+
+      if (['size', 'age', 'pot'].some((key) => url.searchParams.has(key))) {
+        const normalized = productSelectionParams(product, selection, url.searchParams)
+        if (normalized.toString() !== url.searchParams.toString()) {
+          window.history.replaceState(null, '', `${url.pathname}?${normalized}${url.hash}`)
+        }
+      }
+    }
+
+    syncFromURL()
+    window.addEventListener('popstate', syncFromURL)
+    return () => window.removeEventListener('popstate', syncFromURL)
+  }, [product, selectionQuery])
 
   // Use hovered values if hovering, otherwise use selected values
   const displayPotId = hoveredPotId ?? potId
@@ -46,14 +87,23 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
     return null
   }
 
+  const selectCombination = (selection: ProductSelection) => {
+    setVariantId(selection.variantId)
+    setPotId(selection.potId)
+    setHoveredPotId(null)
+    setHoveredVariantId(null)
+
+    const url = new URL(window.location.href)
+    const params = productSelectionParams(product, selection, url.searchParams)
+    window.history.replaceState(null, '', `${url.pathname}?${params}${url.hash}`)
+  }
+
   const toggleVariant = (id: number) => {
     const nextVariant = product.variants.find((variant) => variant.id === id)
     if (!nextVariant) return
 
-    setVariantId(nextVariant.id)
-    setPotId(nextVariant.pots[0]?.id ?? 0)
-    setHoveredPotId(null)
-    setHoveredVariantId(null)
+    const nextPot = nextVariant.pots.find((pot) => pot.id === potId) ?? nextVariant.pots[0]
+    if (nextPot) selectCombination({ variantId: nextVariant.id, potId: nextPot.id })
   }
 
   const handleVariantHover = (id: number) => {
@@ -100,7 +150,7 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
         transition={{ duration: 0.5 }}
         className="space-y-6"
       >
-        <div onMouseLeave={clearHoverSelection}>
+        <div>
           <span className="text-sm font-medium text-forest uppercase tracking-wide">
             {product.category}
           </span>
@@ -109,7 +159,7 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
 
         <p className="text-muted-foreground leading-relaxed">{product.description}</p>
 
-        <div>
+        <div onMouseLeave={clearHoverSelection}>
           {hasVariantSelection && (
             <div>
               <span className="text-sm font-medium text-foreground mb-2 block">{variantLabel}</span>
@@ -126,6 +176,7 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
                       }}
                       onMouseEnter={() => handleVariantHover(variant.id)}
                       aria-label={`${variantWithValue.value} ${variantWithValue.postfix}`}
+                      aria-pressed={variant.id === variantId}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                         variant.id === variantId
                           ? 'bg-forest text-primary-foreground'
@@ -148,11 +199,16 @@ export function ProductClient({ product, phone }: { product: DBProduct; phone: s
                   key={pot.id}
                   type="button"
                   onClick={() => {
-                    setPotId(pot.id)
-                    setHoveredPotId(null)
+                    const owner = hasVariantSelection
+                      ? currentVariant
+                      : product.variants.find((variant) =>
+                          variant.pots.some((entry) => entry.id === pot.id),
+                        )
+                    if (owner) selectCombination({ variantId: owner.id, potId: pot.id })
                   }}
                   onMouseEnter={() => handlePotHover(pot.id)}
                   aria-label={pot.name}
+                  aria-pressed={pot.id === potId}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     hoveredPotId === pot.id
                       ? 'bg-accent text-accent-foreground'

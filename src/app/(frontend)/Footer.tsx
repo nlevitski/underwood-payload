@@ -4,6 +4,8 @@ import { MapPinIcon } from '@/components/icons/MapPin'
 import { PhoneIcon } from '@/components/icons/Phone'
 import Link from 'next/link'
 import type { SiteSettingsData } from '@/globals/fetchers'
+import { getSocialLinks } from '@/lib/social-links'
+import { SocialLinksFooter } from './SocialLinks'
 
 export function Footer({ settings }: { settings: SiteSettingsData }) {
   return (
@@ -90,6 +92,7 @@ export function Footer({ settings }: { settings: SiteSettingsData }) {
                 <span className="text-sm text-muted-foreground">{settings.workingHours}</span>
               </div>
             </div>
+            <SocialLinksFooter links={getSocialLinks(settings)} />
           </div>
         </div>
 
