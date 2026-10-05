@@ -8,6 +8,7 @@ export async function getArticles() {
     const { docs: articles } = await payload.find({
       depth: 2,
       collection: 'articles',
+      pagination: false,
       where: {
         status: {
           equals: statusOptions.published,
@@ -25,6 +26,8 @@ export async function getArticles() {
         status: true,
         readTimeInMins: true,
         publishedAt: true,
+        createdAt: true,
+        updatedAt: true,
       },
       sort: 'id',
     })
@@ -40,6 +43,7 @@ export async function getArticleSlugs() {
     const payload = await getPayloadClient()
     const { docs: articles } = await payload.find({
       collection: 'articles',
+      pagination: false,
       where: {
         status: {
           equals: statusOptions.published,

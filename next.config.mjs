@@ -25,6 +25,30 @@ const contentSecurityPolicy = [
 const nextConfig = {
   distDir: process.env.NEXT_DIST_DIR ?? '.next',
   poweredByHeader: false,
+  async redirects() {
+    // Preserve the product URLs used before the catalog moved into Payload.
+    // Destinations are the current sellable products in the production database.
+    const legacyProductSlugs = {
+      'blueberry-duke': 'berries-blueberry-duke',
+      'lingonberry-koralle': 'berries-lingonberry-coral',
+      'thuja-smaragd': 'conifers-thuja-smaragd',
+      'blackberry-natchez': 'berries-blackberry-natchez',
+      'cranberry-stevens': 'berries-cranberry-stevens',
+      'raspberry-rubyfall': 'Rubyfall-everbearing',
+      'juniper-prince-of-wales': 'conifers-juniper-prince-of-wales',
+      'thuja-danica': 'conifers-thuja-danika',
+      'juniper-wiltonii': 'conifers-juniper-wiltonii',
+      'juniper-lime-glow': 'conifers-juniper-lime-glow',
+      'blueberry-bluecrop': 'berries-blueberry-bluecrop',
+      'juniper-bluearrow': 'conifers-juniper-blue-arrow',
+    }
+
+    return Object.entries(legacyProductSlugs).map(([source, destination]) => ({
+      source: `/catalog/${source}`,
+      destination: `/catalog/${destination}`,
+      permanent: true,
+    }))
+  },
   async headers() {
     return [
       {
