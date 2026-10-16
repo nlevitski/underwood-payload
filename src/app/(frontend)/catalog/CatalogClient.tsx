@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import * as motion from 'motion/react-client'
-import { Filter, X } from 'lucide-react'
+import { Filter, Search, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import {
   Pagination,
   PaginationContent,
@@ -20,6 +22,7 @@ import { Slider } from '@/components/ui/slider'
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -28,19 +31,20 @@ import {
 import { PlantCard } from '../_components/plantCard/PlantCard'
 import type { DBProduct } from './dbProducts'
 import { comparePotCodes } from './productVariantSorting'
+import { matchesProductSearch } from './productSearch'
 
 const perPageOptions = [12, 24, 48] as const
 
 type CatalogSearchParams = Record<string, string | string[] | undefined>
 
 type CatalogClientProps = {
-  initialSearchParams: CatalogSearchParams
   products: DBProduct[]
   heading: string
   description: string
 }
 
 type CatalogState = {
+  query: string
   selectedCategories: string[]
   selectedPots: string[]
   priceRange: [number, number]
@@ -122,6 +126,7 @@ function buildStateFromSearchParams(
   const pageValue = Math.max(1, Math.floor(readNumberParam(searchParams.page, 1)))
 
   return {
+    query: (Array.isArray(searchParams.q) ? searchParams.q[0] : searchParams.q) ?? '',
     selectedCategories,
     selectedPots,
     priceRange,
@@ -133,6 +138,10 @@ function buildStateFromSearchParams(
 
 function buildSearchParamsFromState(state: CatalogState, minPrice: number, maxPrice: number) {
   const params = new URLSearchParams()
+
+  if (state.query.trim()) {
+    params.set('q', state.query.trim())
+  }
 
   if (state.selectedCategories.length > 0) {
     params.set('category', state.selectedCategories.join(','))
@@ -205,14 +214,9 @@ function findLowestPricedSelection(
   return lowestSelection
 }
 
-export function CatalogClient({
-  initialSearchParams,
-  products,
-  heading,
-  description,
-}: CatalogClientProps) {
-  const router = useRouter()
+export function CatalogClient({ products, heading, description }: CatalogClientProps) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   // Calculate dynamic filter values from products
   const { categories, potVolumes, minPrice, maxPrice } = useMemo(() => {
     const categoryKeys = new Set<string>()
@@ -244,19 +248,23 @@ export function CatalogClient({
     }
   }, [products])
 
-  const initialState = useMemo(
-    () =>
-      buildStateFromSearchParams(
-        initialSearchParams,
-        minPrice,
-        maxPrice,
-        categories.map((category) => category.key),
-        potVolumes,
-      ),
-    [initialSearchParams, categories, maxPrice, minPrice, potVolumes],
-  )
+  const initialState = useMemo(() => {
+    const params: CatalogSearchParams = {}
+    searchParams.forEach((_value, key) => {
+      params[key] = searchParams.getAll(key)
+    })
+
+    return buildStateFromSearchParams(
+      params,
+      minPrice,
+      maxPrice,
+      categories.map((category) => category.key),
+      potVolumes,
+    )
+  }, [searchParams, categories, maxPrice, minPrice, potVolumes])
 
   const [showFilters, setShowFilters] = useState(false)
+  const [query, setQuery] = useState(initialState.query)
   const [selectedCategories, setSelectedCategories] = useState<string[]>(
     initialState.selectedCategories,
   )
@@ -273,6 +281,7 @@ export function CatalogClient({
     () =>
       buildSearchParamsFromState(
         {
+          query: initialState.query,
           selectedCategories: initialState.selectedCategories,
           selectedPots: initialState.selectedPots,
           priceRange: initialState.priceRange,
@@ -297,6 +306,10 @@ export function CatalogClient({
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
+      if (!matchesProductSearch(product.name, query)) {
+        return false
+      }
+
       if (selectedCategories.length > 0 && !selectedCategories.includes(product.categoryKey)) {
         return false
       }
@@ -321,7 +334,7 @@ export function CatalogClient({
         })
       })
     })
-  }, [selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
+  }, [products, query, selectedCategories, selectedPots, appliedPriceRange, inStockOnly])
 
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((left, right) => {
@@ -393,6 +406,7 @@ export function CatalogClient({
   useEffect(() => {
     const nextQuery = buildSearchParamsFromState(
       {
+        query,
         selectedCategories,
         selectedPots,
         priceRange: appliedPriceRange,
@@ -410,7 +424,9 @@ export function CatalogClient({
 
     lastSyncedQueryRef.current = nextQuery
     const href = nextQuery ? `${pathname}?${nextQuery}` : pathname
-    router.replace(href, { scroll: false })
+    // The catalog already has its data. Keep the URL shareable without remounting
+    // the input through a server navigation on every keystroke.
+    window.history.replaceState(null, '', `${href}${window.location.hash}`)
   }, [
     inStockOnly,
     maxPrice,
@@ -419,7 +435,7 @@ export function CatalogClient({
     pathname,
     perPage,
     appliedPriceRange,
-    router,
+    query,
     selectedCategories,
     selectedPots,
   ])
@@ -477,6 +493,11 @@ export function CatalogClient({
     setPage(1)
   }
 
+  const clearSearch = () => {
+    setQuery('')
+    setPage(1)
+  }
+
   const goToPage = (nextPage: number) => {
     const clampedPage = Math.min(Math.max(1, nextPage), totalPages)
     setPage(clampedPage)
@@ -511,26 +532,87 @@ export function CatalogClient({
 
       <section className="py-12">
         <div className="container">
-          <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-8">
-            <div className="mb-6 lg:hidden">
-              <Button
-                variant="outline"
-                onClick={() => setShowFilters((prev) => !prev)}
-                className="w-full justify-between"
+          <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-x-8 lg:gap-y-6">
+            <div className="mb-6 flex flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:mb-0 lg:flex-row lg:items-center lg:justify-between min-[1281px]:grid min-[1281px]:grid-cols-3 min-[1281px]:gap-6">
+              <search
+                aria-label="Поиск по каталогу"
+                className="relative w-full lg:max-[1281px]:max-w-md min-[1281px]:col-span-2"
               >
-                <span className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Фильтры
-                </span>
-                {hasActiveFilters && (
-                  <span className="bg-forest text-primary-foreground rounded-full px-2 py-0.5 text-xs">
-                    Активны
-                  </span>
-                )}
-              </Button>
+                <label htmlFor="catalog-search" className="sr-only">
+                  Поиск растений
+                </label>
+                <Search
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground"
+                />
+                <Input
+                  id="catalog-search"
+                  name="q"
+                  type="search"
+                  placeholder="Поиск растений"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value)
+                    setPage(1)
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape') clearSearch()
+                  }}
+                  autoComplete="off"
+                  className="h-10 rounded-lg pl-11"
+                />
+              </search>
+
+              <div className="flex items-center justify-between gap-3 min-[1281px]:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowFilters((prev) => !prev)}
+                  aria-expanded={showFilters}
+                  aria-controls="catalog-filters"
+                  className="h-10 min-w-0 flex-1 px-2 min-[360px]:px-4 lg:hidden"
+                >
+                  <Filter data-icon="inline-start" aria-hidden="true" />
+                  Фильтры{hasActiveFilters ? ' •' : ''}
+                </Button>
+
+                <div className="flex shrink-0 items-center gap-2">
+                  <label
+                    htmlFor="per-page"
+                    className="text-xs text-muted-foreground min-[360px]:text-sm"
+                  >
+                    На странице
+                  </label>
+                  <Select
+                    value={String(perPage)}
+                    onValueChange={(value: string) => {
+                      setPerPage(Number(value))
+                      setPage(1)
+                    }}
+                  >
+                    <SelectTrigger id="per-page" className="h-10 w-[72px] px-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        {perPageOptions.map((option) => (
+                          <SelectItem key={option} value={String(option)}>
+                            {option}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
 
-            <aside className={`${showFilters ? 'block' : 'hidden'} mb-8 lg:mb-0 lg:block`}>
+            <aside
+              id="catalog-filters"
+              className={cn(
+                'mb-8 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:mb-0 lg:block',
+                showFilters ? 'block' : 'hidden',
+              )}
+            >
               <div className="bg-card shadow-soft sticky top-24 rounded-xl p-6">
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="font-semibold text-foreground">Фильтры</h3>
@@ -618,41 +700,19 @@ export function CatalogClient({
               </div>
             </aside>
 
-            <div>
+            <div className="lg:col-start-2 lg:row-start-2">
+              <p
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+                className="sr-only"
+              >
+                {filteredProducts.length > 0
+                  ? `Показано ${(page - 1) * perPage + 1}–${Math.min(page * perPage, filteredProducts.length)} из ${filteredProducts.length}`
+                  : 'Найдено 0 растений'}
+              </p>
               {filteredProducts.length > 0 ? (
                 <>
-                  <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Показано {(page - 1) * perPage + 1}–
-                      {Math.min(page * perPage, filteredProducts.length)} из{' '}
-                      {filteredProducts.length}
-                    </p>
-
-                    <div className="flex items-center gap-2">
-                      <span className="hidden text-sm text-muted-foreground sm:block">
-                        На странице
-                      </span>
-                      <Select
-                        value={String(perPage)}
-                        onValueChange={(value: string) => {
-                          setPerPage(Number(value))
-                          setPage(1)
-                        }}
-                      >
-                        <SelectTrigger id="per-page" className="h-8 w-[72px] px-2 text-xs">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {perPageOptions.map((option) => (
-                            <SelectItem key={option} value={String(option)}>
-                              {option}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
                   <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {paginatedProducts.map((product, index) => {
                       const displayProduct = getDisplayProduct(product)
@@ -714,11 +774,22 @@ export function CatalogClient({
                   className="py-16 text-center"
                 >
                   <p className="mb-4 text-muted-foreground">
-                    Растения не найдены по заданным фильтрам
+                    {query.trim()
+                      ? `По запросу «${query.trim()}» растения не найдены. Попробуйте другое название или измените фильтры.`
+                      : 'Растения не найдены по заданным фильтрам'}
                   </p>
-                  <Button variant="outline" onClick={clearFilters}>
-                    Сбросить фильтры
-                  </Button>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {query.trim() && (
+                      <Button variant="outline" onClick={clearSearch}>
+                        Очистить поиск
+                      </Button>
+                    )}
+                    {hasActiveFilters && (
+                      <Button variant="outline" onClick={clearFilters}>
+                        Сбросить фильтры
+                      </Button>
+                    )}
+                  </div>
                 </motion.div>
               )}
             </div>

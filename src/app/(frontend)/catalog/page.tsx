@@ -65,7 +65,6 @@ export default async function CatalogPage({
   return (
     <CatalogClient
       key={queryKey}
-      initialSearchParams={resolvedSearchParams}
       products={dbProducts}
       heading={page.heading}
       description={page.description}
