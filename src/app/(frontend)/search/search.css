@@ -349,10 +349,6 @@
   outline: 2px solid var(--forest);
   outline-offset: 3px;
 }
-.search-offer:hover,
-.search-primary:hover {
-  background: var(--accent);
-}
 @media (min-width: 768px) {
   .header-row {
     height: 80px;
