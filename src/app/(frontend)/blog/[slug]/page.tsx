@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Calendar, Clock, User } from 'lucide-react'
 import Image from 'next/image'
 import * as motion from 'motion/react-client'
-import { RichText } from '@payloadcms/richtext-lexical/react'
+import { RichText, type JSXConvertersFunction } from '@payloadcms/richtext-lexical/react'
 
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +15,36 @@ import { absoluteURL, buildMetadata } from '@/lib/seo/metadata'
 import { JsonLd } from '@/components/JsonLd'
 
 export const revalidate = 300
+
+const articleConverters: JSXConvertersFunction = ({ defaultConverters }) => ({
+  ...defaultConverters,
+  upload: (args) => {
+    const renderUpload = defaultConverters.upload
+    if (typeof renderUpload !== 'function') return renderUpload ?? null
+
+    const { relationTo, value } = args.node
+    if (relationTo !== 'media' || typeof value !== 'object' || !value.width || !value.height) {
+      return renderUpload(args)
+    }
+
+    const aspectRatio = value.width / value.height
+    // Product thumbnails can be square; article illustrations must retain their original crop.
+    const sizes = Object.fromEntries(
+      Object.entries(value.sizes ?? {}).filter(([, size]) =>
+        size?.width && size.height
+          ? Math.abs(size.width / size.height / aspectRatio - 1) < 0.01
+          : false,
+      ),
+    )
+
+    const image = renderUpload({
+      ...args,
+      node: { ...args.node, value: { ...value, sizes } },
+    })
+
+    return Object.keys(sizes).length ? image : <picture>{image}</picture>
+  },
+})
 
 export async function generateStaticParams() {
   return getBlogPostSlugs()
@@ -168,6 +198,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {post.content ? (
                 <RichText
                   className="blog-rich-text"
+                  converters={articleConverters}
                   data={post.content}
                   disableIndent
                   disableTextAlign

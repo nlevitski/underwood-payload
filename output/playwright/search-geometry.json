@@ -1,0 +1,152 @@
+[
+  {
+    "width": 360,
+    "field": {
+      "x": 24,
+      "y": 76,
+      "width": 312,
+      "height": 48
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 360,
+      "height": 65
+    }
+  },
+  {
+    "width": 390,
+    "field": {
+      "x": 24,
+      "y": 76,
+      "width": 342,
+      "height": 48
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 65
+    }
+  },
+  {
+    "width": 767,
+    "field": {
+      "x": 24,
+      "y": 76,
+      "width": 719,
+      "height": 48
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 767,
+      "height": 65
+    }
+  },
+  {
+    "width": 768,
+    "field": {
+      "x": 24,
+      "y": 96,
+      "width": 720,
+      "height": 40
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 81
+    }
+  },
+  {
+    "width": 834,
+    "field": {
+      "x": 24,
+      "y": 96,
+      "width": 786,
+      "height": 40
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 834,
+      "height": 81
+    }
+  },
+  {
+    "width": 1024,
+    "field": {
+      "x": 24,
+      "y": 96,
+      "width": 976,
+      "height": 40
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 81
+    }
+  },
+  {
+    "width": 1099,
+    "field": {
+      "x": 24,
+      "y": 96,
+      "width": 1051,
+      "height": 40
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1099,
+      "height": 81
+    }
+  },
+  {
+    "width": 1100,
+    "field": {
+      "x": 200,
+      "y": 22,
+      "width": 382.921875,
+      "height": 36
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1100,
+      "height": 81
+    }
+  },
+  {
+    "width": 1280,
+    "field": {
+      "x": 200,
+      "y": 22,
+      "width": 480,
+      "height": 36
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1280,
+      "height": 81
+    }
+  },
+  {
+    "width": 1440,
+    "field": {
+      "x": 280,
+      "y": 22,
+      "width": 480,
+      "height": 36
+    },
+    "header": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 81
+    }
+  }
+]

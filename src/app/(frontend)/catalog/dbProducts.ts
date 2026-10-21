@@ -8,7 +8,7 @@ import type {
   ProductItemCare,
   ProductPot as PayloadProductPot,
   ProductSize,
-  ProductVariant as PayloadProductVariant,
+  ProductVariant as FullPayloadProductVariant,
 } from '@/payload-types'
 import type { Payload } from 'payload'
 import type { SeoMeta } from '@/globals/fetchers'
@@ -58,8 +58,23 @@ export type DBProduct = Omit<Product, 'id' | 'image' | 'variants'> & {
   variants: DBProductVariant[]
 }
 
+type PayloadProductVariant = Pick<
+  FullPayloadProductVariant,
+  | 'id'
+  | 'variantType'
+  | 'category'
+  | 'item'
+  | 'age'
+  | 'size'
+  | 'pot'
+  | 'price'
+  | 'isAvailable'
+  | 'Image'
+>
+
 type GetDbProductsOptions = {
   itemIds?: number[]
+  searchPreview?: boolean
 }
 
 type GroupedProduct = {
@@ -455,6 +470,33 @@ export async function getDbProducts(
 ): Promise<DBProduct[]> {
   const { docs } = await payload.find({
     collection: 'product-variants',
+    ...(options.searchPreview
+      ? {
+          // Same trusted public-catalog read as the full page. Keep the CMS REST
+          // collections private; the search endpoint returns only its public DTO.
+          overrideAccess: true,
+          select: {
+            item: true,
+            category: true,
+            variantType: true,
+            size: true,
+            age: true,
+            pot: true,
+            price: true,
+            isAvailable: true,
+            Image: true,
+          },
+          populate: {
+            'product-items': { nameRu: true, slug: true, updatedAt: true },
+            'product-categories': { nameRu: true, group: true },
+            'product-groups': { name: true, slug: true },
+            'product-sizes': { label: true },
+            'product-ages': { label: true, months: true },
+            'product-pots': { code: true },
+            media: { url: true, sizes: true },
+          },
+        }
+      : {}),
     depth: 3,
     pagination: false,
     limit: 0,

@@ -4,10 +4,9 @@ import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import * as motion from 'motion/react-client'
-import { Filter, Search, X } from 'lucide-react'
+import { Filter, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import {
   Pagination,
@@ -425,7 +424,7 @@ export function CatalogClient({ products, heading, description }: CatalogClientP
     lastSyncedQueryRef.current = nextQuery
     const href = nextQuery ? `${pathname}?${nextQuery}` : pathname
     // The catalog already has its data. Keep the URL shareable without remounting
-    // the input through a server navigation on every keystroke.
+    // the catalog through a server navigation on every filter change.
     window.history.replaceState(null, '', `${href}${window.location.hash}`)
   }, [
     inStockOnly,
@@ -530,40 +529,27 @@ export function CatalogClient({ products, heading, description }: CatalogClientP
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-8 lg:py-12">
         <div className="container">
           <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-x-8 lg:gap-y-6">
-            <div className="mb-6 flex flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:mb-0 lg:flex-row lg:items-center lg:justify-between min-[1281px]:grid min-[1281px]:grid-cols-3 min-[1281px]:gap-6">
-              <search
-                aria-label="Поиск по каталогу"
-                className="relative w-full lg:max-[1281px]:max-w-md min-[1281px]:col-span-2"
-              >
-                <label htmlFor="catalog-search" className="sr-only">
-                  Поиск растений
-                </label>
-                <Search
-                  aria-hidden="true"
-                  className="pointer-events-none absolute top-1/2 left-4 size-5 -translate-y-1/2 text-muted-foreground"
-                />
-                <Input
-                  id="catalog-search"
-                  name="q"
-                  type="search"
-                  placeholder="Поиск растений"
-                  value={query}
-                  onChange={(event) => {
-                    setQuery(event.target.value)
-                    setPage(1)
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Escape') clearSearch()
-                  }}
-                  autoComplete="off"
-                  className="h-10 rounded-lg pl-11"
-                />
-              </search>
+            <div className="mb-6 flex flex-col gap-4 lg:col-start-2 lg:row-start-1 lg:mb-0 lg:flex-row lg:items-center lg:justify-between">
+              {query.trim() && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm">
+                    Поиск: {query.trim()}
+                    <button
+                      type="button"
+                      aria-label="Снять поисковый запрос"
+                      onClick={clearSearch}
+                      className="inline-flex size-6 items-center justify-center"
+                    >
+                      <X size={16} />
+                    </button>
+                  </span>
+                </div>
+              )}
 
-              <div className="flex items-center justify-between gap-3 min-[1281px]:justify-end">
+              <div className="ml-auto flex w-full items-center justify-between gap-3 lg:w-auto">
                 <Button
                   variant="outline"
                   onClick={() => setShowFilters((prev) => !prev)}
@@ -701,12 +687,7 @@ export function CatalogClient({ products, heading, description }: CatalogClientP
             </aside>
 
             <div className="lg:col-start-2 lg:row-start-2">
-              <p
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                className="sr-only"
-              >
+              <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
                 {filteredProducts.length > 0
                   ? `Показано ${(page - 1) * perPage + 1}–${Math.min(page * perPage, filteredProducts.length)} из ${filteredProducts.length}`
                   : 'Найдено 0 растений'}
